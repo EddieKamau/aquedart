@@ -177,7 +177,7 @@ class AuthCode {
   /// Authorization codes are owned by a resource owner, typically a User, Profile or Account
   /// in an application. This value is the primary key or identifying value of those
   /// instances.
-  dynamic resourceOwnerIdentifier;
+  dynamic resourceOwnerIdentifier; 
 
   /// The timestamp this authorization code was issued on.
   DateTime issueDate;
