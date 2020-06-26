@@ -301,7 +301,7 @@ class ManagedAuthDelegate<T extends ManagedAuthResourceOwner>
   final int tokenLimit;
 
   @override
-  Future removeTokens(AuthServer server, int resourceOwnerID) {
+  Future removeTokens(AuthServer server, dynamic resourceOwnerID) {
     final tokenQuery = Query<ManagedAuthToken>(context)
       ..where((o) => o.resourceOwner).identifiedBy(resourceOwnerID);
 

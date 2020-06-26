@@ -143,7 +143,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
   ///
   /// All authorization codes and tokens for the [ResourceOwner] identified by [identifier]
   /// will be revoked.
-  Future revokeAllGrantsForResourceOwner(int identifier) async {
+  Future revokeAllGrantsForResourceOwner(dynamic identifier) async {
     if (identifier == null) {
       throw ArgumentError.notNull("identifier");
     }
@@ -549,7 +549,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
   }
 
   AuthToken _generateToken(
-      int ownerID, String clientID, int expirationInSeconds,
+      dynamic ownerID, String clientID, int expirationInSeconds,
       {bool allowRefresh = true, List<AuthScope> scopes}) {
     final now = DateTime.now().toUtc();
     final token = AuthToken()
@@ -569,7 +569,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
   }
 
   AuthCode _generateAuthCode(
-      int ownerID, AuthClient client, int expirationInSeconds,
+      dynamic ownerID, AuthClient client, int expirationInSeconds,
       {List<AuthScope> scopes}) {
     final now = DateTime.now().toUtc();
     return AuthCode()

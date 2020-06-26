@@ -80,7 +80,7 @@ abstract class AuthServerDelegate {
   /// This method must delete all [AuthToken] and [AuthCode]s for a [ResourceOwner].
   ///
   /// [server] is the requesting [AuthServer]. [resourceOwnerID] is the [ResourceOwner.id].
-  FutureOr removeTokens(AuthServer server, int resourceOwnerID);
+  FutureOr removeTokens(AuthServer server, dynamic resourceOwnerID);
 
   /// Must delete a [AuthToken] granted by [grantedByCode].
   ///
