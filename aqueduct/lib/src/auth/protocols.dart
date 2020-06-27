@@ -23,7 +23,7 @@ abstract class ResourceOwner {
   ///
   /// This unique identifier is used by [AuthServer] to associate authorization codes and access tokens with
   /// this resource owner.
-  int get id;
+  dynamic get id;
 }
 
 /// The methods used by an [AuthServer] to store information and customize behavior related to authorization.
