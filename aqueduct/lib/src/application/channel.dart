@@ -5,7 +5,7 @@ import 'package:aqueduct/src/application/service_registry.dart';
 import 'package:aqueduct/src/openapi/openapi.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 
 import '../http/http.dart';
 import 'application.dart';
@@ -80,22 +80,22 @@ abstract class ApplicationChannel implements APIComponentDocumenter {
   /// By default, this value is null. If the [ApplicationOptions] provided to the application are configured to
   /// reference a private key and certificate file, this value is derived from that information. You may override
   /// this method to provide an alternative means to creating a [SecurityContext].
-  SecurityContext get securityContext {
+  SecurityContext? get securityContext {
     if (options?.certificateFilePath == null ||
         options?.privateKeyFilePath == null) {
       return null;
     }
 
     return SecurityContext()
-      ..useCertificateChain(options.certificateFilePath)
-      ..usePrivateKey(options.privateKeyFilePath);
+      ..useCertificateChain(options!.certificateFilePath!)
+      ..usePrivateKey(options!.privateKeyFilePath!);
   }
 
   /// The configuration options used to start the application this channel belongs to.
   ///
   /// These options are set when starting the application. Changes to this object have no effect
   /// on other isolates.
-  ApplicationOptions options;
+  ApplicationOptions? options;
 
   /// You implement this accessor to define how HTTP requests are handled by your application.
   ///
@@ -114,7 +114,7 @@ abstract class ApplicationChannel implements APIComponentDocumenter {
   ///         }
   Controller get entryPoint;
 
-  ApplicationServer _server;
+  late ApplicationServer _server;
 
   /// You override this method to perform initialization tasks.
   ///
@@ -169,11 +169,11 @@ abstract class ApplicationChannel implements APIComponentDocumenter {
     final context = APIDocumentContext(doc);
     documentComponents(context);
 
-    doc.paths = root.documentPaths(context);
+    doc.paths = root.documentPaths(context)!;
 
     doc.info = APIInfo(
-        projectSpec["name"] as String, projectSpec["version"] as String,
-        description: projectSpec["description"] as String);
+        projectSpec["name"] as String?, projectSpec["version"] as String?,
+        description: projectSpec["description"] as String?);
 
     await context.finalize();
 
@@ -188,7 +188,7 @@ abstract class ApplicationChannel implements APIComponentDocumenter {
     (RuntimeContext.current[runtimeType] as ChannelRuntime)
         .getDocumentableChannelComponents(this)
         .forEach((component) {
-      component.documentComponents(registry);
+      component!.documentComponents(registry);
     });
   }
 }
@@ -231,12 +231,12 @@ class ApplicationMessageHub extends Stream<dynamic> implements Sink<dynamic> {
   /// [onError], if provided, will be invoked when this isolate tries to [add] invalid data. Only the isolate
   /// that failed to send the data will receive [onError] events.
   @override
-  StreamSubscription<dynamic> listen(void onData(dynamic event),
-          {Function onError, void onDone(), bool cancelOnError = false}) =>
+  StreamSubscription<dynamic> listen(void onData(dynamic event)?,
+          {Function? onError, void onDone()?, bool? cancelOnError = false}) =>
       _inboundController.stream.listen(onData,
           onError: onError ??
-              (err, StackTrace st) =>
-                  _logger.severe("ApplicationMessageHub error", err, st),
+              ((err, StackTrace st) =>
+                  _logger.severe("ApplicationMessageHub error", err, st)),
           onDone: onDone,
           cancelOnError: cancelOnError);
 
@@ -267,7 +267,7 @@ class ApplicationMessageHub extends Stream<dynamic> implements Sink<dynamic> {
 }
 
 abstract class ChannelRuntime {
-  Iterable<APIComponentDocumenter> getDocumentableChannelComponents(
+  Iterable<APIComponentDocumenter?> getDocumentableChannelComponents(
     ApplicationChannel channel);
 
   Type get channelType;
@@ -278,6 +278,6 @@ abstract class ChannelRuntime {
 
   ApplicationChannel instantiateChannel();
 
-  Future runGlobalInitialization(ApplicationOptions config);
+  Future? runGlobalInitialization(ApplicationOptions config);
 }
 

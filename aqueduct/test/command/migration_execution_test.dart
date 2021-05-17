@@ -4,14 +4,14 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:aqueduct/aqueduct.dart';
-import 'package:runtime/src/analyzer.dart';
+import 'package:replica/src/analyzer.dart';
 import 'package:aqueduct/src/cli/migration_source.dart';
-import 'package:command_line_agent/command_line_agent.dart';
+import 'package:cli_agent/cli_agent.dart';
 import 'package:test/test.dart';
 
 import '../not_tests/cli_helpers.dart';
 
-CLIClient cli;
+late CLIClient cli;
 DatabaseConfiguration connectInfo = DatabaseConfiguration.withConnectionInfo(
   "dart", "dart", "localhost", 5432, "dart_test");
 String connectString =
@@ -19,7 +19,7 @@ String connectString =
 
 void main() {
 
-  PostgreSQLPersistentStore store;
+  late PostgreSQLPersistentStore store;
 
   setUpAll(() async {
     final t = CLIClient(CommandLineAgent(ProjectAgent.projectsDirectory));
@@ -52,7 +52,7 @@ void main() {
     await Future.wait(tables.map((t) {
       return store.execute("DROP TABLE IF EXISTS $t");
     }));
-    await store?.close();
+    await store.close();
   });
 
   tearDownAll(ProjectAgent.tearDownAll);
@@ -209,14 +209,14 @@ Future<List<String>> columnsOfTable(
   return results.map((rows) => rows.first as String).toList();
 }
 
-Future<bool> tableExists(PersistentStore store, String tableName) async {
+Future<bool> tableExists(PersistentStore store, String? tableName) async {
   final exists = await store.execute("SELECT to_regclass(@tableName:text)",
       substitutionValues: {"tableName": tableName}) as List<List<dynamic>>;
 
   return exists.first.first != null;
 }
 
-List<MigrationSource> getOrderedTestMigrations(List<String> names,
+List<MigrationSource> getOrderedTestMigrations(List<String?> names,
     {int fromVersion = 0}) {
   final uri = Directory.current.uri
       .resolve("test/")
@@ -226,9 +226,9 @@ List<MigrationSource> getOrderedTestMigrations(List<String> names,
   final analyzer = CodeAnalyzer(uri);
   final migrations = analyzer
       .getSubclassesFromFile("Migration", analyzer.uri)
-      .where((cu) => names.contains(cu.name.name))
+      .where((cu) => names.contains(cu!.name.name))
       .map((cu) {
-    final code = cu.toSource();
+    final code = cu!.toSource();
     final offset = cu.name.offset - cu.offset;
 
     // uri is temporary
@@ -244,8 +244,8 @@ List<MigrationSource> getOrderedTestMigrations(List<String> names,
   return migrations;
 }
 
-Future runMigrationCases(List<String> migrationNames,
-    {int fromVersion = 0, StringSink log}) async {
+Future runMigrationCases(List<String?> migrationNames,
+    {int fromVersion = 0, StringSink? log}) async {
   final migs =
       getOrderedTestMigrations(migrationNames, fromVersion: fromVersion);
 
@@ -573,7 +573,7 @@ class Case7 extends Migration {
 
   @override
   Future seed() async {
-    await database.store
+    await database.store!
         .execute("INSERT INTO InvalidTable (foo) VALUES ('foo')");
   }
 }
@@ -599,7 +599,7 @@ class Case81 extends Migration {
 
   @override
   Future seed() async {
-    await store.execute("INSERT INTO _TestObject VALUES (default)");
+    await store!.execute("INSERT INTO _TestObject VALUES (default)");
   }
 }
 

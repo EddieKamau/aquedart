@@ -12,8 +12,8 @@ import 'package:aqueduct/src/dev/helpers.dart';
 
 void main() {
   Controller.letUncaughtExceptionsEscape = true;
-  ManagedContext context;
-  HttpServer server;
+  late ManagedContext context;
+  late HttpServer server;
 
   setUpAll(() async {
     context = await contextWithModels([TestModel, StringModel]);
@@ -32,40 +32,40 @@ void main() {
 
   tearDownAll(() async {
     await context.close();
-    await server?.close(force: true);
+    await server.close(force: true);
   });
 
   test("Request with no path parameters OK", () async {
-    var response = await http.get("http://localhost:8888/users");
+    var response = await http.get(Uri.parse("http://localhost:8888/users"));
     expect(response.statusCode, 200);
   });
 
   test("Request with path parameter of type needing parse OK", () async {
-    var response = await http.get("http://localhost:8888/users/1");
+    var response = await http.get(Uri.parse("http://localhost:8888/users/1"));
     expect(response.statusCode, 200);
   });
 
   test("Request with path parameter of wrong type returns 404", () async {
-    var response = await http.get("http://localhost:8888/users/foo");
+    var response = await http.get(Uri.parse("http://localhost:8888/users/foo"));
     expect(response.statusCode, 404);
   });
 
   test("Request with path parameter and body", () async {
-    var response = await http.put("http://localhost:8888/users/2",
+    var response = await http.put(Uri.parse("http://localhost:8888/users/2"),
         headers: {"Content-Type": "application/json;charset=utf-8"},
         body: json.encode({"name": "joe"}));
     expect(response.statusCode, 200);
   });
 
   test("Request without path parameter and body", () async {
-    var response = await http.post("http://localhost:8888/users",
+    var response = await http.post(Uri.parse("http://localhost:8888/users"),
         headers: {"Content-Type": "application/json;charset=utf-8"},
         body: json.encode({"name": "joe"}));
     expect(response.statusCode, 200);
   });
 
   test("Non-integer, oddly named identifier", () async {
-    var response = await http.get("http://localhost:8888/string/bar");
+    var response = await http.get(Uri.parse("http://localhost:8888/string/bar"));
     expect(response.body, '"bar"');
   });
 }
@@ -81,7 +81,7 @@ class TestModelController extends QueryController<TestModel> {
       statusCode = 400;
     }
 
-    if (query.values.backing.contents.isNotEmpty) {
+    if (query!.values?.backing != null && query!.values!.backing.contents.isNotEmpty) {
       statusCode = 400;
     }
 
@@ -98,14 +98,14 @@ class TestModelController extends QueryController<TestModel> {
 
     final comparisonMatcher = (query as QueryMixin)
         .expressions
-        .firstWhere((expr) => expr.keyPath.path.first.name == "id")
+        .firstWhere((expr) => expr.keyPath.path.first!.name == "id")
         .expression as ComparisonExpression;
     if (comparisonMatcher.operator != PredicateOperator.equalTo ||
         comparisonMatcher.value != id) {
       statusCode = 400;
     }
 
-    if (query.values.backing.contents.isNotEmpty) {
+    if (query!.values?.backing != null && query!.values!.backing.contents.isNotEmpty) {
       statusCode = 400;
     }
 
@@ -116,10 +116,10 @@ class TestModelController extends QueryController<TestModel> {
   Future<Response> putOne(@Bind.path("id") int id) async {
     int statusCode = 200;
 
-    if (query.values == null) {
+    if (query!.values == null) {
       statusCode = 400;
     }
-    if (query.values.name != "joe") {
+    if (query!.values?.name != "joe") {
       statusCode = 400;
     }
     if (query == null) {
@@ -128,18 +128,18 @@ class TestModelController extends QueryController<TestModel> {
 
     final comparisonMatcher = (query as QueryMixin)
         .expressions
-        .firstWhere((expr) => expr.keyPath.path.first.name == "id")
+        .firstWhere((expr) => expr.keyPath.path.first!.name == "id")
         .expression as ComparisonExpression;
     if (comparisonMatcher.operator != PredicateOperator.equalTo ||
         comparisonMatcher.value != id) {
       statusCode = 400;
     }
 
-    if (query.values == null) {
+    if (query!.values == null) {
       statusCode = 400;
     }
 
-    if (query.values.name != "joe") {
+    if (query!.values?.name != "joe") {
       statusCode = 400;
     }
 
@@ -149,10 +149,10 @@ class TestModelController extends QueryController<TestModel> {
   @Operation.post()
   Future<Response> create() async {
     int statusCode = 200;
-    if (query.values == null) {
+    if (query!.values == null) {
       statusCode = 400;
     }
-    if (query.values.name != "joe") {
+    if (query!.values?.name != "joe") {
       statusCode = 400;
     }
     if (query == null) {
@@ -172,10 +172,10 @@ class TestModel extends ManagedObject<_TestModel> implements _TestModel {}
 
 class _TestModel {
   @Column(primaryKey: true)
-  int id;
+  int? id;
 
-  String name;
-  String email;
+  String? name;
+  String? email;
 }
 
 class StringController extends QueryController<StringModel> {
@@ -185,7 +185,7 @@ class StringController extends QueryController<StringModel> {
   Future<Response> get(@Bind.path("id") String id) async {
     final comparisonMatcher = (query as QueryMixin)
         .expressions
-        .firstWhere((expr) => expr.keyPath.path.first.name == "foo")
+        .firstWhere((expr) => expr.keyPath.path.first!.name == "foo")
         .expression as StringExpression;
     return Response.ok(comparisonMatcher.value);
   }
@@ -195,5 +195,5 @@ class StringModel extends ManagedObject<_StringModel> implements _StringModel {}
 
 class _StringModel {
   @Column(primaryKey: true)
-  String foo;
+  String? foo;
 }

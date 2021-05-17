@@ -15,7 +15,7 @@ class ColumnBuilder extends Returnable {
     final entity = table.entity;
 
     // Ensure the primary key is always available and at 0th index.
-    int primaryKeyIndex;
+    int? primaryKeyIndex;
     for (var i = 0; i < keys.length; i++) {
       final firstElement = keys[i].path.first;
       if (firstElement is ManagedAttributeDescription &&
@@ -26,20 +26,20 @@ class ColumnBuilder extends Returnable {
     }
 
     if (primaryKeyIndex == null) {
-      keys.insert(0, KeyPath(entity.primaryKeyAttribute));
+      keys.insert(0, KeyPath(entity!.primaryKeyAttribute));
     } else if (primaryKeyIndex > 0) {
       keys.removeAt(primaryKeyIndex);
-      keys.insert(0, KeyPath(entity.primaryKeyAttribute));
+      keys.insert(0, KeyPath(entity!.primaryKeyAttribute));
     }
 
     return List.from(keys.map((key) {
-      return ColumnBuilder(table, propertyForName(entity, key.path.first.name),
+      return ColumnBuilder(table, propertyForName(entity!, key.path.first!.name),
           documentKeyPath: key.dynamicElements);
     }));
   }
 
   static ManagedPropertyDescription propertyForName(
-      ManagedEntity entity, String propertyName) {
+      ManagedEntity entity, String? propertyName) {
     var property = entity.properties[propertyName];
 
     if (property == null) {
@@ -76,9 +76,9 @@ class ColumnBuilder extends Returnable {
     PredicateOperator.equalTo: "="
   };
 
-  final TableBuilder table;
-  final ManagedPropertyDescription property;
-  final List<dynamic> documentKeyPath;
+  final TableBuilder? table;
+  final ManagedPropertyDescription? property;
+  final List<dynamic>? documentKeyPath;
 
   dynamic convertValueForStorage(dynamic value) {
     if (value == null) {
@@ -89,7 +89,7 @@ class ColumnBuilder extends Returnable {
       final p = property as ManagedAttributeDescription;
       if (p.isEnumeratedValue) {
         return value.toString().split(".").last;
-      } else if (p.type.kind == ManagedPropertyType.document) {
+      } else if (p.type!.kind == ManagedPropertyType.document) {
         if (value is Document) {
           return value.data;
         } else if (value is Map || value is List) {
@@ -112,11 +112,11 @@ class ColumnBuilder extends Returnable {
     if (property is ManagedAttributeDescription) {
       final p = property as ManagedAttributeDescription;
       if (p.isEnumeratedValue) {
-        if (!p.enumerationValueMap.containsKey(value)) {
+        if (!p.enumerationValueMap!.containsKey(value)) {
           throw ValidationException(["invalid option for key '${p.name}'"]);
         }
-        return p.enumerationValueMap[value];
-      } else if (p.type.kind == ManagedPropertyType.document) {
+        return p.enumerationValueMap![value];
+      } else if (p.type!.kind == ManagedPropertyType.document) {
         return Document(value);
       }
     }
@@ -126,7 +126,7 @@ class ColumnBuilder extends Returnable {
 
   String get sqlTypeSuffix {
     var type =
-        PostgreSQLFormat.dataTypeStringForDataType(typeMap[property.type.kind]);
+        PostgreSQLFormat.dataTypeStringForDataType(typeMap[property!.type!.kind]);
     if (type != null) {
       return ":$type";
     }
@@ -134,20 +134,20 @@ class ColumnBuilder extends Returnable {
     return "";
   }
 
-  String sqlColumnName(
+  String? sqlColumnName(
       {bool withTypeSuffix = false,
       bool withTableNamespace = false,
-      String withPrefix}) {
-    var name = property.name;
+      String? withPrefix}) {
+    var name = property!.name;
 
     if (property is ManagedRelationshipDescription) {
       var relatedPrimaryKey = (property as ManagedRelationshipDescription)
-          .destinationEntity
+          .destinationEntity!
           .primaryKey;
       name = "${name}_$relatedPrimaryKey";
     } else if (documentKeyPath != null) {
       final keys =
-          documentKeyPath.map((k) => k is String ? "'$k'" : k).join("->");
+          documentKeyPath!.map((k) => k is String ? "'$k'" : k).join("->");
       name = "$name->$keys";
     }
 
@@ -156,7 +156,7 @@ class ColumnBuilder extends Returnable {
     }
 
     if (withTableNamespace) {
-      return "${table.sqlTableReference}.$name";
+      return "${table!.sqlTableReference}.$name";
     } else if (withPrefix != null) {
       return "$withPrefix$name";
     }

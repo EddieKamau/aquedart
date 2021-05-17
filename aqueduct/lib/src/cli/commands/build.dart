@@ -6,7 +6,7 @@ import 'package:aqueduct/aqueduct.dart';
 import 'package:aqueduct/src/cli/command.dart';
 import 'package:aqueduct/src/cli/metadata.dart';
 import 'package:aqueduct/src/cli/mixins/project.dart';
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 import 'package:args/args.dart' as arg_package;
 
 class CLIBuild extends CLICommand with CLIProject {
@@ -24,7 +24,7 @@ class CLIBuild extends CLICommand with CLIProject {
 
   @override
   Future<int> handle() async {
-    final root = projectDirectory.uri;
+    final root = projectDirectory!.uri;
     final libraryUri = root.resolve("lib/").resolve("$libraryName.dart");
     final ctx = BuildContext(
         libraryUri,
@@ -69,7 +69,7 @@ import 'package:aqueduct/aqueduct.dart';
 import 'package:args/args.dart' as arg_package;
 import 'package:$packageName/$libraryName.dart';
 
-${method.source.replaceFirst("Application<ApplicationChannel>", "Application<$channelName>").replaceFirst("_runnerFunc", "main")}
+${method.source!.replaceFirst("Application<ApplicationChannel>", "Application<$channelName>").replaceFirst("_runnerFunc", "main")}
 """;
   }
 }
@@ -119,9 +119,9 @@ Future _runnerFunc(List<String> args, dynamic sendPort) async {
     ..port = int.parse(values['port'] as String)
     ..address = values['address']
     ..isIpv6Only = values['ipv6-only'] == true
-    ..configurationFilePath = values['config-path'] as String
-    ..certificateFilePath = values['ssl-certificate-path'] as String
-    ..privateKeyFilePath = values['ssl-key-path'] as String;
+    ..configurationFilePath = values['config-path'] as String?
+    ..certificateFilePath = values['ssl-certificate-path'] as String?
+    ..privateKeyFilePath = values['ssl-key-path'] as String?;
 
 
   final isolateCountString = values['isolates'];

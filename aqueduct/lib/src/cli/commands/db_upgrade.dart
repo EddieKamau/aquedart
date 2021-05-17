@@ -9,7 +9,7 @@ import 'package:aqueduct/src/db/postgresql/postgresql_persistent_store.dart';
 import 'package:aqueduct/src/db/query/query.dart';
 import 'package:aqueduct/src/cli/migration_source.dart';
 import 'package:aqueduct/src/db/schema/schema.dart';
-import 'package:isolate_executor/isolate_executor.dart';
+import 'package:loner/loner.dart';
 
 /// Used internally.
 class CLIDatabaseUpgrade extends CLICommand
@@ -25,7 +25,7 @@ class CLIDatabaseUpgrade extends CLICommand
     }
 
     try {
-      final currentVersion = await persistentStore.schemaVersion;
+      final currentVersion = await persistentStore!.schemaVersion;
       final appliedMigrations = migrations
           .where((mig) => mig.versionNumber <= currentVersion)
           .toList();
@@ -76,23 +76,23 @@ class CLIDatabaseUpgrade extends CLICommand
 
   Future<Schema> executeMigrations(List<MigrationSource> migrations,
       Schema fromSchema, int fromVersion) async {
-    final schemaMap = await IsolateExecutor.run(
+    final schemaMap = await Loner.run(
         RunUpgradeExecutable.input(
-            fromSchema, _storeConnectionInfo, migrations, fromVersion),
+            fromSchema, _storeConnectionInfo!, migrations, fromVersion),
         packageConfigURI: packageConfigUri,
         imports: RunUpgradeExecutable.imports,
         additionalContents: MigrationSource.combine(migrations),
         additionalTypes: [DBInfo],
         logHandler: displayProgress);
 
-    if (schemaMap.containsKey("error")) {
-      throw CLIException(schemaMap["error"] as String);
+    if (schemaMap.containsKey("error") == true) {
+      throw CLIException(schemaMap["error"] as String?);
     }
 
     return Schema.fromMap(schemaMap);
   }
 
-  DBInfo get _storeConnectionInfo {
+  DBInfo? get _storeConnectionInfo {
     var s = persistentStore;
     if (s is PostgreSQLPersistentStore) {
       return DBInfo("postgres", s.username, s.password, s.host, s.port,

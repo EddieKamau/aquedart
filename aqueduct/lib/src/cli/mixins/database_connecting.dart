@@ -5,13 +5,13 @@ import 'package:aqueduct/src/cli/metadata.dart';
 import 'package:aqueduct/src/cli/mixins/project.dart';
 import 'package:aqueduct/src/db/persistent_store/persistent_store.dart';
 import 'package:aqueduct/src/db/postgresql/postgresql_persistent_store.dart';
-import 'package:safe_config/safe_config.dart';
+import 'package:safe_yaml/safe_yaml.dart';
 import 'package:aqueduct/src/cli/command.dart';
 
 abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
   static const String flavorPostgreSQL = "postgres";
 
-  DatabaseConfiguration connectedDatabase;
+  late DatabaseConfiguration connectedDatabase;
 
   @Flag("use-ssl",
       help: "Whether or not the database connection should use SSL",
@@ -23,7 +23,7 @@ abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
       help:
           "A database connection URI string. If this option is set, database-config is ignored.",
       valueHelp: "postgres://user:password@localhost:port/databaseName")
-  String get databaseConnectionString => decode("connect");
+  String? get databaseConnectionString => decode("connect");
 
   @Option("flavor",
       abbr: "f",
@@ -41,9 +41,9 @@ abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
   File get databaseConfigurationFile =>
       fileInProjectDirectory(decode("database-config"));
 
-  PersistentStore _persistentStore;
+  PersistentStore? _persistentStore;
 
-  PersistentStore get persistentStore {
+  PersistentStore? get persistentStore {
     if (_persistentStore != null) {
       return _persistentStore;
     }
@@ -98,7 +98,7 @@ abstract class CLIDatabaseConnectingCommand implements CLICommand, CLIProject {
   }
 
   @override
-  Future cleanup() async {
+  Future? cleanup() async {
     return _persistentStore?.close();
   }
 

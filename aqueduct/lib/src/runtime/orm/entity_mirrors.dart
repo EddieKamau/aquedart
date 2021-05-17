@@ -6,8 +6,8 @@ import 'package:aqueduct/src/utilities/mirror_helpers.dart';
 
 ManagedType getManagedTypeFromType(TypeMirror type) {
   ManagedPropertyType kind;
-  ManagedType elements;
-  Map<String, dynamic> enumerationMap;
+  ManagedType? elements;
+  Map<String, dynamic>? enumerationMap;
 
   if (type.isAssignableTo(reflectType(int))) {
     kind = ManagedPropertyType.integer;
@@ -37,7 +37,7 @@ ManagedType getManagedTypeFromType(TypeMirror type) {
     enumerationMap = enumeratedCases.fold(<String, dynamic>{}, (m, v) {
       m[v.toString().split(".").last] = v;
       return m;
-    });
+    } as Map<String, dynamic>? Function(Map<String, dynamic>?, dynamic));
   } else {
     throw UnsupportedError(
       "Invalid type '${type.reflectedType}' for 'ManagedType'.");
@@ -90,7 +90,7 @@ bool isTransientAccessorMethod(DeclarationMirror declMir) {
     return false;
   }
 
-  var methodMirror = declMir as MethodMirror;
+  var methodMirror = declMir;
   if (methodMirror.isStatic) {
     return false;
   }
@@ -118,5 +118,5 @@ bool isTransientPropertyOrAccessor(DeclarationMirror declaration) {
 List<Validate> validatorsFromDeclaration(DeclarationMirror dm) =>
     allMetadataOfType<Validate>(dm);
 
-Serialize transientMetadataFromDeclaration(DeclarationMirror dm) =>
+Serialize? transientMetadataFromDeclaration(DeclarationMirror dm) =>
     firstMetadataOfType(dm);

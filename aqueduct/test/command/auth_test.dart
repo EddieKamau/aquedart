@@ -3,7 +3,7 @@
 import 'package:aqueduct/aqueduct.dart';
 import 'package:aqueduct/managed_auth.dart';
 import 'package:aqueduct/src/dev/context_helpers.dart';
-import 'package:command_line_agent/command_line_agent.dart';
+import 'package:cli_agent/cli_agent.dart';
 import 'package:test/test.dart';
 
 import '../not_tests/cli_helpers.dart';
@@ -11,9 +11,9 @@ import '../not_tests/cli_helpers.dart';
 void main() {
   final dataModel = ManagedDataModel.fromCurrentMirrorSystem();
   final schema = Schema.fromDataModel(dataModel);
-  ManagedContext context;
-  PersistentStore store;
-  CLIClient cli;
+  late ManagedContext context;
+  late PersistentStore store;
+  late CLIClient cli;
 
   setUpAll(() async {
     cli = CLIClient(ProjectAgent("application_test", dependencies: {
@@ -70,7 +70,7 @@ void main() {
       expect(results.first.allowedScope, isNull);
       expect(results.first.redirectURI, isNull);
 
-      final salt = results.first.salt;
+      final salt = results.first.salt!;
       final secret = results.first.hashedSecret;
       expect(AuthUtility.generatePasswordHash("abc", salt), secret);
     });
@@ -93,7 +93,7 @@ void main() {
       expect(results.first.allowedScope, isNull);
       expect(results.first.redirectURI, "http://foobar.com");
 
-      final salt = results.first.salt;
+      final salt = results.first.salt!;
       final secret = results.first.hashedSecret;
       expect(AuthUtility.generatePasswordHash("abc", salt), secret);
     });

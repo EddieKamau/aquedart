@@ -29,7 +29,7 @@ final List<String> dartExpressionForColumnsWithAllAttributeOptions = [
 ];
 
 void main() {
-  SchemaBuilder builder;
+  late SchemaBuilder builder;
 
   setUp(() {
     builder = SchemaBuilder(null, Schema.empty());

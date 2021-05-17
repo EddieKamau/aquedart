@@ -59,7 +59,7 @@ class Request implements RequestOrResponse {
   /// Information about the client connection.
   ///
   /// Note: accessing this property incurs a significant performance penalty.
-  HttpConnectionInfo get connectionInfo => raw.connectionInfo;
+  HttpConnectionInfo? get connectionInfo => raw.connectionInfo;
 
   /// The response object of this [Request].
   ///
@@ -73,9 +73,9 @@ class Request implements RequestOrResponse {
   /// permission information from the authenticator. Use this to determine client, resource owner
   /// or other properties of the authentication information in the request. This value will be
   /// null if no permission has been set.
-  Authorization authorization;
+  Authorization? authorization;
 
-  List<_ResponseModifier> _responseModifiers;
+  List<_ResponseModifier>? _responseModifiers;
 
   /// The acceptable content types for a [Response] returned for this instance.
   ///
@@ -85,14 +85,14 @@ class Request implements RequestOrResponse {
   /// a q-value (if one exists) and the specificity of the content-type.
   ///
   /// See also [acceptsContentType].
-  List<ContentType> get acceptableContentTypes {
+  List<ContentType>? get acceptableContentTypes {
     if (_cachedAcceptableTypes == null) {
       try {
         var contentTypes = raw.headers[HttpHeaders.acceptHeader]
                 ?.expand((h) => h.split(",").map((s) => s.trim()))
-                ?.where((h) => h.isNotEmpty)
-                ?.map(ContentType.parse)
-                ?.toList() ??
+                .where((h) => h.isNotEmpty)
+                .map(ContentType.parse)
+                .toList() ??
             [];
 
         contentTypes.sort((c1, c2) {
@@ -126,7 +126,7 @@ class Request implements RequestOrResponse {
     return _cachedAcceptableTypes;
   }
 
-  List<ContentType> _cachedAcceptableTypes;
+  List<ContentType>? _cachedAcceptableTypes;
 
   /// Whether a [Response] may contain a body of type [contentType].
   ///
@@ -135,11 +135,11 @@ class Request implements RequestOrResponse {
   ///
   /// Note that if no Accept header is present, this method always returns true.
   bool acceptsContentType(ContentType contentType) {
-    if (acceptableContentTypes.isEmpty) {
+    if (acceptableContentTypes!.isEmpty) {
       return true;
     }
 
-    return acceptableContentTypes.any((acceptable) {
+    return acceptableContentTypes!.any((acceptable) {
       if (acceptable.primaryType == "*") {
         return true;
       }
@@ -183,7 +183,7 @@ class Request implements RequestOrResponse {
   /// The timestamp for when this request was responded to.
   ///
   /// Used for logging.
-  DateTime respondDate;
+  DateTime? respondDate;
 
   /// Allows a [Controller] to modify the response eventually created for this request, without creating that response itself.
   ///
@@ -203,13 +203,13 @@ class Request implements RequestOrResponse {
   ///         }
   void addResponseModifier(void modifier(Response response)) {
     _responseModifiers ??= [];
-    _responseModifiers.add(modifier);
+    _responseModifiers!.add(modifier);
   }
 
   String get _sanitizedHeaders {
     StringBuffer buf = StringBuffer("{");
 
-    raw?.headers?.forEach((k, v) {
+    raw.headers.forEach((k, v) {
       buf.write("${_truncatedString(k)} : ${_truncatedString(v.join(","))}\\n");
     });
     buf.write("}");
@@ -243,7 +243,7 @@ class Request implements RequestOrResponse {
       modifier(aqueductResponse);
     });
 
-    _Reference<String> compressionType = _Reference(null);
+    _Reference<String?> compressionType = _Reference(null);
     var body = aqueductResponse.body;
     if (body is! Stream) {
       // Note: this pre-encodes the body in memory, such that encoding fails this will throw and we can return a 500
@@ -251,14 +251,14 @@ class Request implements RequestOrResponse {
       body = _responseBodyBytes(aqueductResponse, compressionType);
     }
 
-    response.statusCode = aqueductResponse.statusCode;
-    aqueductResponse.headers?.forEach((k, v) {
-      response.headers.add(k, v);
+    response.statusCode = aqueductResponse.statusCode!;
+    aqueductResponse.headers.forEach((k, v) {
+      response.headers.add(k, v as Object);
     });
 
     if (aqueductResponse.cachePolicy != null) {
       response.headers.add(HttpHeaders.cacheControlHeader,
-          aqueductResponse.cachePolicy.headerValue);
+          aqueductResponse.cachePolicy!.headerValue);
     }
 
     if (body == null) {
@@ -272,7 +272,7 @@ class Request implements RequestOrResponse {
     if (body is List<int>) {
       if (compressionType.value != null) {
         response.headers
-            .add(HttpHeaders.contentEncodingHeader, compressionType.value);
+            .add(HttpHeaders.contentEncodingHeader, compressionType.value!);
       }
       response.headers.add(HttpHeaders.contentLengthHeader, body.length);
 
@@ -281,10 +281,10 @@ class Request implements RequestOrResponse {
       return response.close();
     } else if (body is Stream) {
       // Otherwise, body is stream
-      final bodyStream = _responseBodyStream(aqueductResponse, compressionType);
+      final bodyStream = _responseBodyStream(aqueductResponse, compressionType)!;
       if (compressionType.value != null) {
         response.headers
-            .add(HttpHeaders.contentEncodingHeader, compressionType.value);
+            .add(HttpHeaders.contentEncodingHeader, compressionType.value!);
       }
       response.headers.add(HttpHeaders.transferEncodingHeader, "chunked");
       response.bufferOutput = aqueductResponse.bufferOutput;
@@ -299,13 +299,13 @@ class Request implements RequestOrResponse {
     throw StateError("Invalid response body. Could not encode.");
   }
 
-  List<int> _responseBodyBytes(
-      Response resp, _Reference<String> compressionType) {
+  List<int>? _responseBodyBytes(
+      Response resp, _Reference<String?> compressionType) {
     if (resp.body == null) {
       return null;
     }
 
-    Codec<dynamic, List<int>> codec;
+    Codec<dynamic, List<int>>? codec;
     if (resp.encodeBody) {
       codec =
           CodecRegistry.defaultInstance.codecForContentType(resp.contentType);
@@ -315,7 +315,7 @@ class Request implements RequestOrResponse {
     // There isn't a great way of doing this that I can think of except splitting out gzip from the fused codec,
     // have to measure the value of fusing vs the cost of gzipping smaller data.
     var canGzip = CodecRegistry.defaultInstance
-            .isContentTypeCompressable(resp.contentType) &&
+            .isContentTypeCompressable(resp.contentType!)! &&
         _acceptsGzipResponseBody;
 
     if (codec == null) {
@@ -324,10 +324,10 @@ class Request implements RequestOrResponse {
             "Invalid response body. Body of type '${resp.body.runtimeType}' cannot be encoded as content-type '${resp.contentType}'.");
       }
 
-      final bytes = resp.body as List<int>;
+      final bytes = resp.body as List<int>?;
       if (canGzip) {
         compressionType.value = "gzip";
-        return gzip.encode(bytes);
+        return gzip.encode(bytes!);
       }
       return bytes;
     }
@@ -340,16 +340,16 @@ class Request implements RequestOrResponse {
     return codec.encode(resp.body);
   }
 
-  Stream<List<int>> _responseBodyStream(
-      Response resp, _Reference<String> compressionType) {
-    Codec<dynamic, List<int>> codec;
+  Stream<List<int>>? _responseBodyStream(
+      Response resp, _Reference<String?> compressionType) {
+    Codec<dynamic, List<int>>? codec;
     if (resp.encodeBody) {
       codec =
           CodecRegistry.defaultInstance.codecForContentType(resp.contentType);
     }
 
     var canGzip = CodecRegistry.defaultInstance
-            .isContentTypeCompressable(resp.contentType) &&
+            .isContentTypeCompressable(resp.contentType!)! &&
         _acceptsGzipResponseBody;
     if (codec == null) {
       if (resp.body is! Stream<List<int>>) {
@@ -357,10 +357,10 @@ class Request implements RequestOrResponse {
             "Invalid response body. Body of type '${resp.body.runtimeType}' cannot be encoded as content-type '${resp.contentType}'.");
       }
 
-      final stream = resp.body as Stream<List<int>>;
+      final stream = resp.body as Stream<List<int>>?;
       if (canGzip) {
         compressionType.value = "gzip";
-        return gzip.encoder.bind(stream);
+        return gzip.encoder.bind(stream!);
       }
 
       return stream;
@@ -398,7 +398,7 @@ class Request implements RequestOrResponse {
       bool includeHeaders = false}) {
     var builder = StringBuffer();
     if (includeRequestIP) {
-      builder.write("${raw.connectionInfo?.remoteAddress?.address} ");
+      builder.write("${raw.connectionInfo?.remoteAddress.address} ");
     }
     if (includeMethod) {
       builder.write("${raw.method} ");
@@ -408,7 +408,7 @@ class Request implements RequestOrResponse {
     }
     if (includeElapsedTime && respondDate != null) {
       builder
-          .write("${respondDate.difference(receivedDate).inMilliseconds}ms ");
+          .write("${respondDate!.difference(receivedDate).inMilliseconds}ms ");
     }
     if (includeStatusCode) {
       builder.write("${raw.response.statusCode} ");

@@ -8,7 +8,7 @@ import 'package:aqueduct/src/db/managed/relationship_type.dart';
 // These tests verifying that the raw persistent store migration commands are mapped to one or more specific SQL statements
 void main() {
   group("Table generation command mapping", () {
-    PostgreSQLPersistentStore psc;
+    late PostgreSQLPersistentStore psc;
     setUp(() {
       psc = PostgreSQLPersistentStore(null, null, null, null, null);
     });
@@ -42,7 +42,7 @@ void main() {
     test("Create table with indices", () {
       var dm = ManagedDataModel([GeneratorModel2]);
       var schema = Schema.fromDataModel(dm);
-      schema.tableForName("_GeneratorModel2").addColumn(
+      schema.tableForName("_GeneratorModel2")!.addColumn(
           SchemaColumn("a", ManagedPropertyType.integer, isIndexed: true));
       var commands = schema.tables
           .map((t) => psc.createTable(t))
@@ -228,7 +228,7 @@ void main() {
   });
 
   group("Non-create table generator mappings", () {
-    PostgreSQLPersistentStore psc;
+    late PostgreSQLPersistentStore psc;
     setUp(() {
       psc = PostgreSQLPersistentStore(null, null, null, null, null);
     });
@@ -236,7 +236,7 @@ void main() {
     test("Delete table", () {
       var dm = ManagedDataModel([GeneratorModel1]);
       var schema = Schema.fromDataModel(dm);
-      var cmds = psc.deleteTable(schema.tableForName("_GeneratorModel1"));
+      var cmds = psc.deleteTable(schema.tableForName("_GeneratorModel1")!);
       expect(cmds, ["DROP TABLE _GeneratorModel1"]);
     });
 
@@ -289,7 +289,7 @@ void main() {
           dm.entityForType(GeneratorModel2),
           DeleteRule.cascade,
           ManagedRelationshipType.belongsTo,
-          dm.entityForType(GeneratorModel2).primaryKey,
+          dm.entityForType(GeneratorModel2)!.primaryKey,
           indexed: true,
           nullable: true);
       var cmds = psc.addColumn(
@@ -424,7 +424,7 @@ void main() {
   });
 
   group("Unique column set", () {
-    PostgreSQLPersistentStore psc;
+    late PostgreSQLPersistentStore psc;
     setUp(() {
       psc = PostgreSQLPersistentStore(null, null, null, null, null);
     });
@@ -433,7 +433,7 @@ void main() {
       var dm = ManagedDataModel([Unique]);
       var schema = Schema.fromDataModel(dm);
 
-      var cmds = psc.addTableUniqueColumnSet(schema.tableForName("_Unique"));
+      var cmds = psc.addTableUniqueColumnSet(schema.tableForName("_Unique")!);
       expect(cmds.first,
           "CREATE UNIQUE INDEX _Unique_unique_idx ON _Unique (a,b)");
     });
@@ -441,9 +441,9 @@ void main() {
     test("Can remove unique", () {
       var dm = ManagedDataModel([Unique]);
       var schema = Schema.fromDataModel(dm);
-      schema.tableForName("_Unique").uniqueColumnSet = null;
+      schema.tableForName("_Unique")!.uniqueColumnSet = null;
 
-      var cmds = psc.deleteTableUniqueColumnSet(schema.tableForName("_Unique"));
+      var cmds = psc.deleteTableUniqueColumnSet(schema.tableForName("_Unique")!);
       expect(cmds.first, "DROP INDEX IF EXISTS _Unique_unique_idx");
     });
 
@@ -452,7 +452,7 @@ void main() {
       var schema = Schema.fromDataModel(dm);
 
       var cmds =
-          psc.addTableUniqueColumnSet(schema.tableForName("_UniqueBelongsTo"));
+          psc.addTableUniqueColumnSet(schema.tableForName("_UniqueBelongsTo")!);
       expect(cmds.first,
           "CREATE UNIQUE INDEX _UniqueBelongsTo_unique_idx ON _UniqueBelongsTo (a,container_id)");
     });
@@ -462,24 +462,24 @@ void main() {
 class GeneratorModel1 extends ManagedObject<_GeneratorModel1>
     implements _GeneratorModel1 {
   @Serialize()
-  String foo;
+  String? foo;
 }
 
 class _GeneratorModel1 {
   @primaryKey
-  int id;
+  int? id;
 
-  String name;
+  String? name;
 
-  bool option;
+  bool? option;
 
   @Column(unique: true)
-  double points;
+  double? points;
 
   @Column(nullable: true)
-  DateTime validDate;
+  DateTime? validDate;
 
-  Document document;
+  Document? document;
 }
 
 class GeneratorModel2 extends ManagedObject<_GeneratorModel2>
@@ -487,7 +487,7 @@ class GeneratorModel2 extends ManagedObject<_GeneratorModel2>
 
 class _GeneratorModel2 {
   @Column(primaryKey: true, indexed: true)
-  int id;
+  int? id;
 }
 
 class GeneratorModel3 extends ManagedObject<_GeneratorModel3>
@@ -495,45 +495,45 @@ class GeneratorModel3 extends ManagedObject<_GeneratorModel3>
 
 class _GeneratorModel3 {
   @Column(defaultValue: "(now() at time zone 'utc')")
-  DateTime creationDate;
+  DateTime? creationDate;
 
   @Column(primaryKey: true, defaultValue: "18")
-  int id;
+  int? id;
 
   @Column(defaultValue: "\$\$dflt\$\$")
-  String textValue;
+  String? textValue;
 
   @Column(defaultValue: "true")
-  bool option;
+  bool? option;
 
   @Column(defaultValue: "'1900-01-01T00:00:00.000Z'")
-  DateTime otherTime;
+  DateTime? otherTime;
 
   @Column(defaultValue: "20.0")
-  double value;
+  double? value;
 }
 
 class GenUser extends ManagedObject<_GenUser> implements _GenUser {}
 
 class _GenUser {
   @Column(primaryKey: true)
-  int id;
+  int? id;
 
-  String name;
+  String? name;
 
-  ManagedSet<GenPost> posts;
+  ManagedSet<GenPost>? posts;
 }
 
 class GenPost extends ManagedObject<_GenPost> implements _GenPost {}
 
 class _GenPost {
   @Column(primaryKey: true)
-  int id;
+  int? id;
 
-  String text;
+  String? text;
 
   @Relate(Symbol('posts'), isRequired: false, onDelete: DeleteRule.restrict)
-  GenUser owner;
+  GenUser? owner;
 }
 
 class GenNamed extends ManagedObject<_GenNamed> implements _GenNamed {}
@@ -541,66 +541,66 @@ class GenNamed extends ManagedObject<_GenNamed> implements _GenNamed {}
 @Table(name: "GenNamed")
 class _GenNamed {
   @Column(primaryKey: true)
-  int id;
+  int? id;
 }
 
 class GenOwner extends ManagedObject<_GenOwner> implements _GenOwner {}
 
 class _GenOwner {
   @primaryKey
-  int id;
+  int? id;
 
-  GenAuth auth;
+  GenAuth? auth;
 }
 
 class GenAuth extends ManagedObject<_GenAuth> implements _GenAuth {}
 
 class _GenAuth {
   @Column(primaryKey: true)
-  int id;
+  int? id;
 
   @Relate(Symbol('auth'), isRequired: false, onDelete: DeleteRule.cascade)
-  GenOwner owner;
+  GenOwner? owner;
 }
 
 class GenLeft extends ManagedObject<_GenLeft> implements _GenLeft {}
 
 class _GenLeft {
   @Column(primaryKey: true)
-  int id;
+  int? id;
 
-  ManagedSet<GenJoin> join;
+  ManagedSet<GenJoin>? join;
 }
 
 class GenRight extends ManagedObject<_GenRight> implements _GenRight {}
 
 class _GenRight {
   @Column(primaryKey: true)
-  int id;
+  int? id;
 
-  ManagedSet<GenJoin> join;
+  ManagedSet<GenJoin>? join;
 }
 
 class GenJoin extends ManagedObject<_GenJoin> implements _GenJoin {}
 
 class _GenJoin {
   @primaryKey
-  int id;
+  int? id;
 
   @Relate(Symbol('join'))
-  GenLeft left;
+  GenLeft? left;
 
   @Relate(Symbol('join'))
-  GenRight right;
+  GenRight? right;
 }
 
 class GenObj extends ManagedObject<_GenObj> implements _GenObj {}
 
 class _GenObj {
   @primaryKey
-  int id;
+  int? id;
 
-  GenNotNullable gen;
+  GenNotNullable? gen;
 }
 
 class GenNotNullable extends ManagedObject<_GenNotNullable>
@@ -608,26 +608,26 @@ class GenNotNullable extends ManagedObject<_GenNotNullable>
 
 class _GenNotNullable {
   @primaryKey
-  int id;
+  int? id;
 
   @Relate(Symbol('gen'), onDelete: DeleteRule.nullify, isRequired: false)
-  GenObj ref;
+  GenObj? ref;
 }
 
 class PrivateField extends ManagedObject<_PrivateField>
     implements _PrivateField {
-  set public(String p) {
+  set public(String? p) {
     _private = p;
   }
 
-  String get public => _private;
+  String? get public => _private;
 }
 
 class _PrivateField {
   @primaryKey
-  int id;
+  int? id;
 
-  String _private;
+  String? _private;
 }
 
 enum EnumValues { abcd, efgh, other18 }
@@ -636,9 +636,9 @@ class EnumObject extends ManagedObject<_EnumObject> implements _EnumObject {}
 
 class _EnumObject {
   @primaryKey
-  int id;
+  int? id;
 
-  EnumValues enumValues;
+  EnumValues? enumValues;
 }
 
 class Unique extends ManagedObject<_Unique> {}
@@ -646,20 +646,20 @@ class Unique extends ManagedObject<_Unique> {}
 @Table.unique([Symbol('a'), Symbol('b')])
 class _Unique {
   @primaryKey
-  int id;
+  int? id;
 
-  String a;
-  String b;
-  String c;
+  String? a;
+  String? b;
+  String? c;
 }
 
 class UniqueContainer extends ManagedObject<_UniqueContainer> {}
 
 class _UniqueContainer {
   @primaryKey
-  int id;
+  int? id;
 
-  UniqueBelongsTo contains;
+  UniqueBelongsTo? contains;
 }
 
 class UniqueBelongsTo extends ManagedObject<_UniqueBelongsTo> {}
@@ -667,9 +667,9 @@ class UniqueBelongsTo extends ManagedObject<_UniqueBelongsTo> {}
 @Table.unique([Symbol('a'), Symbol('container')])
 class _UniqueBelongsTo {
   @primaryKey
-  int id;
+  int? id;
 
-  int a;
+  int? a;
   @Relate(Symbol('contains'))
-  UniqueContainer container;
+  UniqueContainer? container;
 }

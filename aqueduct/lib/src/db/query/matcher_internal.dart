@@ -19,15 +19,15 @@ class ComparisonExpression implements PredicateExpression {
   const ComparisonExpression(this.value, this.operator);
 
   final dynamic value;
-  final PredicateOperator operator;
+  final PredicateOperator? operator;
 
   @override
   PredicateExpression get inverse {
     return ComparisonExpression(value, inverseOperator);
   }
 
-  PredicateOperator get inverseOperator {
-    switch (operator) {
+  PredicateOperator? get inverseOperator {
+    switch (operator!) {
       case PredicateOperator.lessThan:
         return PredicateOperator.greaterThanEqualTo;
       case PredicateOperator.greaterThan:
@@ -42,8 +42,6 @@ class ComparisonExpression implements PredicateExpression {
         return PredicateOperator.notEqual;
     }
 
-    // this line just shuts up the analyzer
-    return null;
   }
 }
 

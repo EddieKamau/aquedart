@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:aqueduct/src/http/http.dart';
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 
 /// Decodes [bytes] according to [contentType].
 ///
@@ -20,7 +20,7 @@ abstract class BodyDecoder {
   /// Determines how [bytes] get decoded.
   ///
   /// A decoder is chosen from [CodecRegistry] according to this value.
-  ContentType get contentType;
+  ContentType? get contentType;
 
   /// Whether or not [bytes] is empty.
   ///
@@ -51,13 +51,13 @@ abstract class BodyDecoder {
           "Invalid body decoding. Must decode data prior to calling 'decodedType'.");
     }
 
-    return (_decodedData as Object).runtimeType;
+    return (_decodedData as Object?).runtimeType;
   }
 
   /// The raw bytes of this request body.
   ///
   /// This value is valid if [retainOriginalBytes] was set to true prior to [decode] being invoked.
-  List<int> get originalBytes {
+  List<int>? get originalBytes {
     if (retainOriginalBytes == false) {
       throw StateError(
           "'originalBytes' were not retained. Set 'retainOriginalBytes' to true prior to decoding.");
@@ -67,7 +67,7 @@ abstract class BodyDecoder {
 
   final Stream<List<int>> _originalByteStream;
   dynamic _decodedData;
-  List<int> _bytes;
+  List<int>? _bytes;
 
   /// Decodes this object's bytes as [T].
   ///

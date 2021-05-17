@@ -11,19 +11,19 @@ abstract class ResourceOwner {
   ///
   /// This value must be unique amongst all resource owners. It is often an email address. This value
   /// is used by authenticating users to identify their account.
-  String username;
+  String? username;
 
   /// The hashed password of this instance.
-  String hashedPassword;
+  String? hashedPassword;
 
   /// The salt the [hashedPassword] was hashed with.
-  String salt;
+  String? salt;
 
   /// A unique identifier of this resource owner.
   ///
   /// This unique identifier is used by [AuthServer] to associate authorization codes and access tokens with
   /// this resource owner.
-  dynamic get id;
+  String? get id;
 }
 
 /// The methods used by an [AuthServer] to store information and customize behavior related to authorization.
@@ -41,7 +41,7 @@ abstract class AuthServerDelegate {
   /// Every property declared by [ResourceOwner] must be non-null in the return value.
   ///
   /// [server] is the [AuthServer] invoking this method.
-  FutureOr<ResourceOwner> getResourceOwner(AuthServer server, String username);
+  FutureOr<ResourceOwner?> getResourceOwner(AuthServer server, String username);
 
   /// Must store [client].
   ///
@@ -53,7 +53,7 @@ abstract class AuthServerDelegate {
   ///
   /// This method must return an instance of [AuthClient] if one exists for [clientID]. Otherwise, it must return null.
   /// [server] is the [AuthServer] requesting the [AuthClient].
-  FutureOr<AuthClient> getClient(AuthServer server, String clientID);
+  FutureOr<AuthClient?> getClient(AuthServer server, String? clientID);
 
   /// Removes an [AuthClient] for a client ID.
   ///
@@ -74,8 +74,8 @@ abstract class AuthServerDelegate {
   /// If no match is found, return null.
   ///
   /// [server] is the [AuthServer] requesting the [AuthToken].
-  FutureOr<AuthToken> getToken(AuthServer server,
-      {String byAccessToken, String byRefreshToken});
+  FutureOr<AuthToken?> getToken(AuthServer server,
+      {String? byAccessToken, String? byRefreshToken});
 
   /// This method must delete all [AuthToken] and [AuthCode]s for a [ResourceOwner].
   ///
@@ -102,7 +102,7 @@ abstract class AuthServerDelegate {
   ///
   /// If this token was granted through an authorization code, [issuedFrom] is that code. Otherwise, [issuedFrom]
   /// is null.
-  FutureOr addToken(AuthServer server, AuthToken token, {AuthCode issuedFrom});
+  FutureOr addToken(AuthServer server, AuthToken token, {AuthCode? issuedFrom});
 
   /// Must update [AuthToken] with [newAccessToken, [newIssueDate, [newExpirationDate].
   ///
@@ -111,8 +111,8 @@ abstract class AuthServerDelegate {
   ///
   /// You may alter the token in addition to the provided values, and you may override the provided values.
   /// [newAccessToken] defaults to a random 32 character string.
-  FutureOr updateToken(AuthServer server, String oldAccessToken,
-      String newAccessToken, DateTime newIssueDate, DateTime newExpirationDate);
+  FutureOr updateToken(AuthServer server, String? oldAccessToken,
+      String? newAccessToken, DateTime? newIssueDate, DateTime? newExpirationDate);
 
   /// Must store [code].
   ///
@@ -123,12 +123,12 @@ abstract class AuthServerDelegate {
   ///
   /// This must return an instance of [AuthCode] where [AuthCode.code] matches [code].
   /// Return null if no matching code.
-  FutureOr<AuthCode> getCode(AuthServer server, String code);
+  FutureOr<AuthCode?> getCode(AuthServer server, String code);
 
   /// Must remove [AuthCode] identified by [code].
   ///
   /// The [AuthCode.code] matching [code] must be deleted and no longer accessible.
-  FutureOr removeCode(AuthServer server, String code);
+  FutureOr removeCode(AuthServer server, String? code);
 
   /// Returns list of allowed scopes for a given [ResourceOwner].
   ///
@@ -142,5 +142,5 @@ abstract class AuthServerDelegate {
   /// When overriding this method, it is important to note that (by default) only the properties declared by [ResourceOwner]
   /// will be valid for [owner]. If [owner] has properties that are application-specific (like a `role`),
   /// [getResourceOwner] must also be overridden to ensure those values are fetched.
-  List<AuthScope> getAllowedScopes(ResourceOwner owner) => AuthScope.any;
+  List<AuthScope>? getAllowedScopes(ResourceOwner owner) => AuthScope.any;
 }

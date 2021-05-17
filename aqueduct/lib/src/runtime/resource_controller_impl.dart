@@ -8,8 +8,7 @@ import 'package:aqueduct/src/runtime/resource_controller/documenter.dart';
 import 'package:aqueduct/src/runtime/resource_controller/utility.dart';
 import 'package:aqueduct/src/runtime/resource_controller_generator.dart';
 import 'package:aqueduct/src/utilities/mirror_helpers.dart';
-import 'package:meta/meta.dart';
-import 'package:runtime/runtime.dart' hide firstMetadataOfType;
+import 'package:replica/replica.dart' hide firstMetadataOfType;
 
 class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
   ResourceControllerRuntimeImpl(this.type) {
@@ -19,7 +18,7 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
         .whereType<VariableMirror>()
         .where((decl) => decl.metadata.any((im) => im.reflectee is Bind))
         .map((decl) {
-      final isRequired = allDeclarations[decl.simpleName]
+      final isRequired = allDeclarations[decl.simpleName]!
           .metadata
           .any((im) => im.reflectee is RequiredBinding);
       return getParameterForVariable(decl, isRequired: isRequired);
@@ -61,9 +60,9 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
         op.namedParameters,
         ivarParameters
       ]
-          .expand((i) => i)
-          .map((p) => reflectType(p.type).location.sourceUri)
-          .where((uri) => uri != null && (uri.scheme == "package" || (uri.scheme == "file" && uri.isAbsolute)))
+          .expand((i) => i!)
+          .map((p) => reflectType(p.type).location!.sourceUri)
+          .where((uri) =>uri.scheme == "package" || (uri.scheme == "file" && uri.isAbsolute))
           .map((uri) => "import '$uri';")
           .toList();
       directives.addAll(imports);
@@ -115,7 +114,7 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
   }
 
   ResourceControllerParameter getParameterForVariable(VariableMirror mirror,
-      {@required bool isRequired}) {
+      {required bool isRequired}) {
     final metadata = mirror.metadata
         .firstWhere((im) => im.reflectee is Bind)
         .reflectee as Bind;
@@ -125,7 +124,7 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
     }
 
     final boundType = mirror.type as ClassMirror;
-    dynamic Function(dynamic input) decoder;
+    dynamic Function(dynamic input)? decoder;
 
     switch (metadata.bindingType) {
       case BindingType.body:
@@ -185,7 +184,7 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
           } else {
             decoder = (b) {
               final body = b as RequestBody;
-              return runtimeCast(body.as(), boundType);
+              return replicaCast(body.as(), boundType);
             };
           }
         }
@@ -205,7 +204,7 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
           }
           decoder = (value) {
             return _convertParameterListWithMirror(
-                value as List<String>, boundType);
+                value as List<String>?, boundType);
           };
         }
         break;
@@ -216,7 +215,7 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
                 "Cannot bind variable of type 'List' to path parameter.");
           }
           decoder = (value) {
-            return _convertParameterWithMirror(value as String, mirror.type);
+            return _convertParameterWithMirror(value as String?, mirror.type);
           };
         }
         break;
@@ -230,7 +229,7 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
           }
           decoder = (value) {
             return _convertParameterListWithMirror(
-                value as List<String>, mirror.type);
+                value as List<String>?, mirror.type);
           };
         }
         break;
@@ -253,7 +252,7 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
   }
 
   ResourceControllerOperation getOperationForMethod(MethodMirror mirror) {
-    final operation = getMethodOperationMetadata(mirror);
+    final operation = getMethodOperationMetadata(mirror)!;
     final symbol = mirror.simpleName;
 
     final parametersWithoutMetadata = mirror.parameters
@@ -287,7 +286,7 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
           return reflect(rc)
               .invoke(symbol, args.positionalArguments,
                   args.namedArguments.map((k, v) => MapEntry(Symbol(k), v)))
-              .reflectee as Future<Response>;
+              .reflectee as Future<Response>?;
         });
   }
 }
@@ -308,13 +307,13 @@ void _enforceTypeCanBeParsedFromString(
     return;
   }
 
-  final classMirror = typeMirror as ClassMirror;
+  final classMirror = typeMirror;
   if (!classMirror.staticMembers.containsKey(#parse)) {
     throw _makeError(
         varMirror, 'Parameter type does not implement static parse method.');
   }
 
-  final parseMethod = classMirror.staticMembers[#parse];
+  final parseMethod = classMirror.staticMembers[#parse]!;
   final params = parseMethod.parameters.where((p) => !p.isOptional).toList();
   if (params.length == 1 &&
       params.first.type.isAssignableTo(reflectType(String))) {
@@ -325,9 +324,9 @@ void _enforceTypeCanBeParsedFromString(
 }
 
 dynamic _convertParameterListWithMirror(
-    List<String> parameterValues, TypeMirror typeMirror) {
+    List<String>? parameterValues, TypeMirror typeMirror) {
   if (typeMirror.isSubtypeOf(reflectType(List))) {
-    final iterable = parameterValues.map((str) =>
+    final iterable = parameterValues!.map((str) =>
         _convertParameterWithMirror(str, typeMirror.typeArguments.first));
 
     return (typeMirror as ClassMirror).newInstance(#from, [iterable]).reflectee;
@@ -335,7 +334,7 @@ dynamic _convertParameterListWithMirror(
     if (parameterValues == null) {
       print('wtf');
     }
-    if (parameterValues.length > 1) {
+    if (parameterValues!.length > 1) {
       throw ArgumentError("multiple values not expected");
     }
     return _convertParameterWithMirror(parameterValues.first, typeMirror);
@@ -343,7 +342,7 @@ dynamic _convertParameterListWithMirror(
 }
 
 dynamic _convertParameterWithMirror(
-    String parameterValue, TypeMirror typeMirror) {
+    String? parameterValue, TypeMirror typeMirror) {
   if (typeMirror.isSubtypeOf(reflectType(bool))) {
     return true;
   }
@@ -353,7 +352,7 @@ dynamic _convertParameterWithMirror(
   }
 
   final classMirror = typeMirror as ClassMirror;
-  final parseDecl = classMirror.declarations[#parse];
+  final parseDecl = classMirror.declarations[#parse]!;
   try {
     return classMirror.invoke(parseDecl.simpleName, [parameterValue]).reflectee;
   } catch (_) {

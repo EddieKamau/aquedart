@@ -5,7 +5,7 @@ import 'package:aqueduct/src/http/resource_controller_interfaces.dart';
 import 'package:aqueduct/src/runtime/resource_controller/documenter.dart';
 import 'package:aqueduct/src/runtime/resource_controller_impl.dart';
 import 'package:aqueduct/src/utilities/sourcify.dart';
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 
 String getInvokerSource(BuildContext context,
     ResourceControllerRuntimeImpl controller, ResourceControllerOperation op) {
@@ -39,7 +39,7 @@ String getApplyRequestPropertiesSource(
   StringBuffer buf = StringBuffer();
   final subclassName = MirrorSystem.getName(runtime.type.simpleName);
 
-  runtime.ivarParameters.forEach((f) {
+  runtime.ivarParameters!.forEach((f) {
     buf.writeln("(untypedController as $subclassName).${f.symbolName} "
         "= args.instanceVariables['${f.symbolName}'] as ${f.type};");
   });
@@ -49,7 +49,7 @@ String getApplyRequestPropertiesSource(
 
 String getResourceControllerImplSource(
     BuildContext context, ResourceControllerRuntimeImpl runtime) {
-  final ivarSources = runtime.ivarParameters
+  final ivarSources = runtime.ivarParameters!
       .map((i) => getParameterSource(context, runtime, i))
       .join(",\n");
   final operationSources = runtime.operations
@@ -80,32 +80,28 @@ String getDecoderSource(
       {
         return getElementDecoderSource(parameter.type);
       }
-      break;
     case BindingType.header:
       {
         return getListDecoderSource(parameter);
       }
-      break;
     case BindingType.query:
       {
         return getListDecoderSource(parameter);
       }
-      break;
     case BindingType.body:
       {
         return getBodyDecoderSource(parameter);
       }
-      break;
   }
-  throw StateError("unknown parameter");
+  // throw StateError("unknown parameter");
 }
 
-String sourcifyFilter(List<String> filter) {
+String sourcifyFilter(List<String>? filter) {
   if (filter == null) {
     return "null";
   }
 
-  return "[${filter?.map((s) => "'$s'")?.join(",")}]";
+  return "[${filter.map((s) => "'$s'").join(",")}]";
 }
 
 String getBodyDecoderSource(ResourceControllerParameter p) {
@@ -209,7 +205,7 @@ String getOperationSource(
     BuildContext context,
     ResourceControllerRuntimeImpl runtime,
     ResourceControllerOperation operation) {
-  final scopeElements = operation.scopes?.map((s) => "AuthScope(${sourcifyValue(s.toString())})")?.join(",");
+  final scopeElements = operation.scopes?.map((s) => "AuthScope(${sourcifyValue(s.toString())})").join(",");
   final namedParameters = operation.namedParameters
       .map((p) => getParameterSource(context, runtime, p))
       .join(",");

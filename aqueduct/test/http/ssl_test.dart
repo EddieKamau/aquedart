@@ -6,10 +6,10 @@ import 'package:test/test.dart';
 
 void main() {
   group("SSL", () {
-    Application app;
+    late Application app;
 
     tearDown(() async {
-      await app?.stop();
+      await app.stop();
     });
 
     test("Start with HTTPS", () async {

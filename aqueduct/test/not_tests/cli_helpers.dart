@@ -5,7 +5,7 @@ import 'package:aqueduct/aqueduct.dart';
 import 'package:aqueduct/src/cli/runner.dart';
 import 'package:aqueduct/src/cli/running_process.dart';
 
-import 'package:command_line_agent/command_line_agent.dart';
+import 'package:cli_agent/cli_agent.dart';
 
 class CLIClient {
   CLIClient(this.agent);
@@ -19,7 +19,7 @@ class CLIClient {
 
     throw StateError("is not a project terminal");
   }
-  List<String> defaultArgs;
+  List<String>? defaultArgs;
 
   String get output {
     return _output.toString();
@@ -71,8 +71,9 @@ class CLIClient {
 
   Future<CLIClient> createProject(
       {String name = "application_test",
-      String template,
+      String? template,
       bool offline = true}) async {
+        final args = <String>[];
     if (template == null) {
       final client = CLIClient(ProjectAgent(name, dependencies: {
         "aqueduct" : {
@@ -104,16 +105,17 @@ class TestChannel extends ApplicationChannel {
   """);
       
       return client;
+    }else{
+      
+      args.addAll(["-t", template]);
+    
     }
     
     try {
       ProjectAgent.projectsDirectory.createSync();
     } catch (_) {}
 
-    final args = <String>[];
-    if (template != null) {
-      args.addAll(["-t", template]);
-    }
+    
 
     if (offline) {
       args.add("--offline");
@@ -162,7 +164,7 @@ class TestChannel extends ApplicationChannel {
     return files;
   }
 
-  Future<int> run(String command, [List<String> args]) async {
+  Future<int> run(String command, [List<String>? args]) async {
     args ??= [];
     args.insert(0, command);
     args.addAll(defaultArgs ?? []);
@@ -185,7 +187,7 @@ class TestChannel extends ApplicationChannel {
   }
 
   CLITask start(String command, List<String> inputArgs) {
-    final args = inputArgs ?? [];
+    final args = inputArgs;
     args.insert(0, command);
     args.addAll(defaultArgs ?? []);
 
@@ -235,14 +237,14 @@ class TestChannel extends ApplicationChannel {
 }
 
 class CLIResult {
-  int exitCode;
+  int? exitCode;
   StringBuffer collectedOutput = StringBuffer();
 
   String get output => collectedOutput.toString();
 }
 
 class CLITask {
-  StoppableProcess process;
+  StoppableProcess? process;
 
   Future get hasStarted => _processStarted.future;
 

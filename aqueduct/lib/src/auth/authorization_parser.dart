@@ -7,7 +7,7 @@ abstract class AuthorizationParser<T> {
 }
 
 /// Parses a Bearer token from an Authorization header.
-class AuthorizationBearerParser extends AuthorizationParser<String> {
+class AuthorizationBearerParser extends AuthorizationParser<String?> {
   const AuthorizationBearerParser();
 
   /// Parses a Bearer token from [authorizationHeader]. If the header is malformed or doesn't exist,
@@ -17,11 +17,11 @@ class AuthorizationBearerParser extends AuthorizationParser<String> {
   ///
   /// If [authorizationHeader] is malformed or null, throws an [AuthorizationParserException].
   @override
-  String parse(String authorizationHeader) {
-    if (authorizationHeader == null) {
-      throw AuthorizationParserException(
-          AuthorizationParserExceptionReason.missing);
-    }
+  String? parse(String authorizationHeader) {
+    // if (authorizationHeader == null) {
+    //   throw AuthorizationParserException(
+    //       AuthorizationParserExceptionReason.missing);
+    // }
 
     final matcher = RegExp("Bearer (.+)");
     final match = matcher.firstMatch(authorizationHeader);
@@ -38,10 +38,10 @@ class AuthorizationBearerParser extends AuthorizationParser<String> {
 /// See [AuthorizationBasicParser] for getting instances of this type.
 class AuthBasicCredentials {
   /// The username of a Basic Authorization header.
-  String username;
+  String? username;
 
   /// The password of a Basic Authorization header.
-  String password;
+  String? password;
 
   @override
   String toString() => "$username:$password";
@@ -59,7 +59,7 @@ class AuthorizationBasicParser
   ///
   /// If [authorizationHeader] is malformed or null, throws an [AuthorizationParserException].
   @override
-  AuthBasicCredentials parse(String authorizationHeader) {
+  AuthBasicCredentials parse(String? authorizationHeader) {
     if (authorizationHeader == null) {
       throw AuthorizationParserException(
           AuthorizationParserExceptionReason.missing);
@@ -72,7 +72,7 @@ class AuthorizationBasicParser
           AuthorizationParserExceptionReason.malformed);
     }
 
-    final base64String = match[1];
+    final base64String = match[1]!;
     String decodedCredentials;
     try {
       decodedCredentials =

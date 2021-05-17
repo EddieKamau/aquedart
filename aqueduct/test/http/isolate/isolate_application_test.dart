@@ -10,7 +10,7 @@ import 'package:test/test.dart';
 
 void main() {
   group("Lifecycle", () {
-    Application<TestChannel> app;
+    late Application<TestChannel> app;
 
     setUp(() async {
       app = Application<TestChannel>();
@@ -20,7 +20,7 @@ void main() {
 
     tearDown(() async {
       print("stopping");
-      await app?.stop();
+      await app.stop();
       print("stopped");
     });
 
@@ -29,13 +29,13 @@ void main() {
     });
 
     test("Application responds to request", () async {
-      var response = await http.get("http://localhost:8888/t");
+      var response = await http.get(Uri.parse("http://localhost:8888/t"));
       expect(response.statusCode, 200);
     });
 
     test("Application properly routes request", () async {
-      var tRequest = http.get("http://localhost:8888/t");
-      var rRequest = http.get("http://localhost:8888/r");
+      var tRequest = http.get(Uri.parse("http://localhost:8888/t"));
+      var rRequest = http.get(Uri.parse("http://localhost:8888/r"));
 
       var tResponse = await tRequest;
       var rResponse = await rRequest;
@@ -48,7 +48,7 @@ void main() {
       var reqs = <Future>[];
       var responses = <http.Response>[];
       for (int i = 0; i < 20; i++) {
-        var req = http.get("http://localhost:8888/t");
+        var req = http.get(Uri.parse("http://localhost:8888/t"));
         // ignore: unawaited_futures
         req.then((resp) {
           responses.add(resp);
@@ -72,13 +72,13 @@ void main() {
       await app.stop();
 
       try {
-        await http.get("http://localhost:8888/t");
+        await http.get(Uri.parse("http://localhost:8888/t"));
         // ignore: empty_catches
       } on SocketException {}
 
       await app.start(numberOfInstances: 2, consoleLogging: true);
 
-      var resp = await http.get("http://localhost:8888/t");
+      var resp = await http.get(Uri.parse("http://localhost:8888/t"));
       expect(resp.statusCode, 200);
     });
 
@@ -87,7 +87,7 @@ void main() {
         () async {
       var sum = 0;
       for (var i = 0; i < 10; i++) {
-        var result = await http.get("http://localhost:8888/startup");
+        var result = await http.get(Uri.parse("http://localhost:8888/startup"));
         sum += int.parse(json.decode(result.body) as String);
       }
       expect(sum, 10);
@@ -95,10 +95,10 @@ void main() {
   });
 
   group("App launch status", () {
-    Application<TestChannel> app;
+    late Application<TestChannel> app;
 
     tearDown(() async {
-      await app?.stop();
+      await app.stop();
     });
 
     test(
@@ -120,7 +120,7 @@ void main() {
 
 class TestChannel extends ApplicationChannel {
   static Future initializeApplication(ApplicationOptions config) async {
-    final v = config.context["startup"] as List<int> ?? [];
+    final v = config.context["startup"] as List<int>? ?? [];
     v.add(1);
     config.context["startup"] = v;
   }
@@ -131,7 +131,7 @@ class TestChannel extends ApplicationChannel {
     router.route("/t").linkFunction((req) async => Response.ok("t_ok"));
     router.route("/r").linkFunction((req) async => Response.ok("r_ok"));
     router.route("startup").linkFunction((r) async {
-      var total = options.context["startup"].fold(0, (a, b) => a + b);
+      var total = options!.context["startup"].fold(0, (a, b) => a + b);
       return Response.ok("$total");
     });
     return router;

@@ -6,7 +6,7 @@ import 'package:aqueduct/src/application/channel.dart';
 import 'package:aqueduct/src/runtime/orm/data_model_compiler.dart';
 
 import 'package:aqueduct/src/runtime/impl.dart';
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 
 class AqueductCompiler extends Compiler {
   @override
@@ -32,7 +32,7 @@ class AqueductCompiler extends Compiler {
 
   @override
   List<Uri> getUrisToResolve(BuildContext context) {
-    return context.context.getSubclassesOf(ManagedObject).map((c) => c.location.sourceUri).toList();
+    return context.context.getSubclassesOf(ManagedObject).map((c) => c.location!.sourceUri).toList();
   }
 
   @override

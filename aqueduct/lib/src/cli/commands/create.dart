@@ -24,7 +24,7 @@ class CLITemplateCreator extends CLICommand with CLIAqueductGlobal {
       help: "Will fetch dependencies from a local cache if they exist.")
   bool get offline => decode("offline");
 
-  String get projectName =>
+  String? get projectName =>
       remainingArguments.isNotEmpty ? remainingArguments.first : null;
 
   @override
@@ -34,12 +34,12 @@ class CLITemplateCreator extends CLICommand with CLIAqueductGlobal {
       return 1;
     }
 
-    if (!isSnakeCase(projectName)) {
+    if (!isSnakeCase(projectName!)) {
       displayError("Invalid project name ($projectName is not snake_case).");
       return 1;
     }
 
-    var destDirectory = destinationDirectoryFromPath(projectName);
+    var destDirectory = destinationDirectoryFromPath(projectName!);
     if (destDirectory.existsSync()) {
       displayError("${destDirectory.path} already exists, stopping.");
       return 1;
@@ -59,8 +59,8 @@ class CLITemplateCreator extends CLICommand with CLIAqueductGlobal {
     copyProjectFiles(destDirectory, templateSourceDirectory, projectName);
 
     createProjectSpecificFiles(destDirectory.path);
-    if (aqueductPackageRef.sourceType == "path") {
-      final aqueductLocation = aqueductPackageRef.resolve().location;
+    if (aqueductPackageRef!.sourceType == "path") {
+      final aqueductLocation = aqueductPackageRef!.resolve()!.location;
 
       addDependencyOverridesToPackage(destDirectory.path, {
         "aqueduct": aqueductLocation.uri,
@@ -122,18 +122,18 @@ class CLITemplateCreator extends CLICommand with CLIAqueductGlobal {
     return true;
   }
 
-  void interpretContentFile(String projectName, Directory destinationDirectory,
+  void interpretContentFile(String? projectName, Directory destinationDirectory,
       FileSystemEntity sourceFileEntity) {
     if (shouldIncludeItem(sourceFileEntity)) {
       if (sourceFileEntity is Directory) {
         copyDirectory(projectName, destinationDirectory, sourceFileEntity);
       } else if (sourceFileEntity is File) {
-        copyFile(projectName, destinationDirectory, sourceFileEntity);
+        copyFile(projectName!, destinationDirectory, sourceFileEntity);
       }
     }
   }
 
-  void copyDirectory(String projectName, Directory destinationParentDirectory,
+  void copyDirectory(String? projectName, Directory destinationParentDirectory,
       Directory sourceDirectory) {
     var sourceDirectoryName = sourceDirectory
         .uri.pathSegments[sourceDirectory.uri.pathSegments.length - 2];
@@ -204,7 +204,7 @@ class CLITemplateCreator extends CLICommand with CLIAqueductGlobal {
   }
 
   void copyProjectFiles(Directory destinationDirectory,
-      Directory sourceDirectory, String projectName) {
+      Directory sourceDirectory, String? projectName) {
     displayInfo(
         "Copying template files to new project directory (${destinationDirectory.path})...");
     try {
@@ -249,10 +249,10 @@ class CLITemplateCreator extends CLICommand with CLIAqueductGlobal {
           .timeout(const Duration(seconds: 60));
       process.stdout
           .transform(utf8.decoder)
-          .listen((output) => outputSink?.write(output));
+          .listen((output) => outputSink.write(output));
       process.stderr
           .transform(utf8.decoder)
-          .listen((output) => outputSink?.write(output));
+          .listen((output) => outputSink.write(output));
 
       final exitCode = await process.exitCode;
 
@@ -336,7 +336,7 @@ class CLITemplateList extends CLICommand with CLIAqueductGlobal {
 class CLIAqueductGlobal {
   PubCache pub = PubCache();
 
-  PackageRef get aqueductPackageRef {
+  PackageRef? get aqueductPackageRef {
     return pub
         .getGlobalApplications()
         .firstWhere((app) => app.name == "aqueduct")
@@ -344,7 +344,7 @@ class CLIAqueductGlobal {
   }
 
   Uri get templateDirectory {
-    return aqueductPackageRef.resolve().location.uri.resolve("templates/");
+    return aqueductPackageRef!.resolve()!.location.uri.resolve("templates/");
   }
 
   Uri getTemplateLocation(String templateName) {

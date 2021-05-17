@@ -9,8 +9,8 @@ import 'package:test/test.dart';
 import 'package:aqueduct/src/dev/helpers.dart';
 
 void main() {
-  HttpServer server;
-  HttpClient client;
+  HttpServer? server;
+  late HttpClient client;
 
   setUp(() async {
     client = HttpClient();
@@ -26,7 +26,7 @@ void main() {
     var response = Response.ok("xyz")..contentType = ContentType("foo", "bar");
     server = await bindAndRespondWith(response);
 
-    var resp = await http.get("http://localhost:8888");
+    var resp = await http.get(Uri.parse("http://localhost:8888"));
 
     expect(resp.statusCode, 500);
     expect(response.headers["content-type"], isNull);
@@ -38,8 +38,8 @@ void main() {
       ..contentType = ContentType("foo", "bar");
     server = await bindAndRespondWith(response);
 
-    var resp = await http.get("http://localhost:8888");
-    var contentType = ContentType.parse(resp.headers["content-type"]);
+    var resp = await http.get(Uri.parse("http://localhost:8888"));
+    var contentType = ContentType.parse(resp.headers["content-type"]!);
     expect(resp.statusCode, 200);
     expect(contentType.primaryType, "foo");
     expect(contentType.subType, "bar");
@@ -53,8 +53,8 @@ void main() {
     var response = Response.ok("xyz")..contentType = ContentType("text", "bar");
     server = await bindAndRespondWith(response);
 
-    var resp = await http.get("http://localhost:8888");
-    var contentType = ContentType.parse(resp.headers["content-type"]);
+    var resp = await http.get(Uri.parse("http://localhost:8888"));
+    var contentType = ContentType.parse(resp.headers["content-type"]!);
     expect(resp.statusCode, 200);
     expect(contentType.primaryType, "text");
     expect(contentType.subType, "bar");
@@ -70,7 +70,7 @@ void main() {
       ..contentType = ContentType("b", "bar");
     server = await bindAndRespondWith(serverResponse);
 
-    var resp = await http.get("http://localhost:8888");
+    var resp = await http.get(Uri.parse("http://localhost:8888"));
     expect(resp.statusCode, 200);
     expect(resp.headers["content-type"], "b/bar");
     expect(resp.body, "hello");
@@ -87,7 +87,7 @@ void main() {
       ..contentType = ContentType("a", "specific", charset: "utf-8");
     server = await bindAndRespondWith(serverResponse);
 
-    var resp = await http.get("http://localhost:8888");
+    var resp = await http.get(Uri.parse("http://localhost:8888"));
     expect(resp.statusCode, 200);
     expect(resp.headers["content-type"], "a/specific; charset=utf-8");
     expect(json.decode(resp.body), {"key": "value"});
@@ -101,7 +101,7 @@ void main() {
       ..contentType = ContentType("application", "crash");
     server = await bindAndRespondWith(serverResponse);
 
-    var resp = await http.get("http://localhost:8888");
+    var resp = await http.get(Uri.parse("http://localhost:8888"));
     expect(resp.statusCode, 500);
   });
 
@@ -110,7 +110,7 @@ void main() {
       ..contentType = ContentType("text", "plain", charset: "abcd");
     server = await bindAndRespondWith(serverResponse);
 
-    var resp = await http.get("http://localhost:8888");
+    var resp = await http.get(Uri.parse("http://localhost:8888"));
     expect(resp.statusCode, 415);
   });
 
@@ -122,14 +122,14 @@ void main() {
       ..contentType = ContentType("application", "baddata");
     server = await bindAndRespondWith(serverResponse);
 
-    var resp = await http.get("http://localhost:8888");
+    var resp = await http.get(Uri.parse("http://localhost:8888"));
     expect(resp.statusCode, 500);
   });
 
   test("Encode with x-www-form-urlencoded", () {
     final codec = CodecRegistry
       .defaultInstance
-      .codecForContentType(ContentType("application", "x-www-form-urlencoded"));
+      .codecForContentType(ContentType("application", "x-www-form-urlencoded"))!;
 
     expect(codec.encode(<String, dynamic>{"k": "v"}), "k=v".codeUnits);
     expect(codec.encode(<String, dynamic>{"k": "v!v"}), "k=v%21v".codeUnits);
@@ -266,11 +266,11 @@ Future<HttpServer> bindAndRespondWith(Response response) async {
   return server;
 }
 
-class ByteCodec extends Codec<dynamic, List<int>> {
+class ByteCodec extends Codec<dynamic, List<int>?> {
   @override
   Converter<dynamic, List<int>> get encoder => const ByteEncoder();
   @override
-  Converter<List<int>, dynamic> get decoder => null;
+  Converter<List<int>, dynamic> get decoder => null  as Converter<List<int>, String>;
 }
 
 class ByteEncoder extends Converter<String, List<int>> {
@@ -283,7 +283,7 @@ class CrashingCodec extends Codec {
   @override
   Converter get encoder => const CrashingEncoder();
   @override
-  Converter get decoder => null;
+  Converter get decoder => null as Converter<List<int>, String>;
 }
 
 class CrashingEncoder extends Converter<String, List<int>> {
@@ -296,7 +296,7 @@ class BadDataCodec extends Codec {
   @override
   Converter get encoder => const BadDataEncoder();
   @override
-  Converter get decoder => null;
+  Converter get decoder => null  as Converter<List<int>, String>;
 }
 
 class BadDataEncoder extends Converter<String, String> {

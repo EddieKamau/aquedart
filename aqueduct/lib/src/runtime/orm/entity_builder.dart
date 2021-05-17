@@ -10,6 +10,7 @@ import 'package:aqueduct/src/runtime/orm/property_builder.dart';
 import 'package:aqueduct/src/db/managed/relationship_type.dart';
 import 'package:aqueduct/src/runtime/orm_impl.dart';
 import 'package:aqueduct/src/utilities/mirror_helpers.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:logging/logging.dart';
 
 class EntityBuilder {
@@ -27,7 +28,7 @@ class EntityBuilder {
 
     properties = _getProperties();
     primaryKeyProperty = properties
-        .firstWhere((p) => p.column?.isPrimaryKey ?? false, orElse: () => null);
+        .firstWhereOrNull((p) => p.column?.isPrimaryKey ?? false);
     if (primaryKeyProperty == null) {
       throw ManagedDataModelErrorImpl.noPrimaryKey(entity);
     }
@@ -35,33 +36,33 @@ class EntityBuilder {
 
   final ClassMirror instanceType;
   final ClassMirror tableDefinitionType;
-  final Table metadata;
+  final Table? metadata;
 
-  ManagedEntityRuntime runtime;
+  ManagedEntityRuntime? runtime;
 
-  String name;
-  ManagedEntity entity;
-  List<String> uniquePropertySet;
-  PropertyBuilder primaryKeyProperty;
+  String? name;
+  ManagedEntity? entity;
+  List<String>? uniquePropertySet;
+  PropertyBuilder? primaryKeyProperty;
   List<PropertyBuilder> properties = [];
-  Map<String, ManagedAttributeDescription> attributes = {};
-  Map<String, ManagedRelationshipDescription> relationships = {};
+  Map<String?, ManagedAttributeDescription?> attributes = {};
+  Map<String?, ManagedRelationshipDescription?> relationships = {};
 
   String get instanceTypeName => MirrorSystem.getName(instanceType.simpleName);
 
   String get tableDefinitionTypeName =>
       MirrorSystem.getName(tableDefinitionType.simpleName);
 
-  void compile(List<EntityBuilder> entityBuilders) {
+  void compile(List<EntityBuilder>? entityBuilders) {
     properties.forEach((p) {
       p.compile(entityBuilders);
     });
 
     uniquePropertySet =
-        metadata?.uniquePropertySet?.map(MirrorSystem.getName)?.toList();
+        metadata?.uniquePropertySet?.map(MirrorSystem.getName).toList();
   }
 
-  void validate(List<EntityBuilder> entityBuilders) {
+  void validate(List<EntityBuilder>? entityBuilders) {
     // Check that we have a default constructor
     if (!classHasDefaultConstructor(instanceType)) {
       throw ManagedDataModelErrorImpl.noConstructor(instanceType);
@@ -74,19 +75,19 @@ class EntityBuilder {
 
     // Check that our unique property set is valid
     if (uniquePropertySet != null) {
-      if (uniquePropertySet.isEmpty) {
+      if (uniquePropertySet!.isEmpty) {
         throw ManagedDataModelErrorImpl.emptyEntityUniqueProperties(
             tableDefinitionTypeName);
-      } else if (uniquePropertySet.length == 1) {
+      } else if (uniquePropertySet!.length == 1) {
         throw ManagedDataModelErrorImpl.singleEntityUniqueProperty(
-            tableDefinitionTypeName, metadata.uniquePropertySet.first);
+            tableDefinitionTypeName, metadata!.uniquePropertySet!.first);
       }
 
-      uniquePropertySet.forEach((key) {
+      uniquePropertySet!.forEach((key) {
         final prop = properties.firstWhere((p) => p.name == key, orElse: () {
           throw ManagedDataModelErrorImpl.invalidEntityUniqueProperty(
               tableDefinitionTypeName, Symbol(key));
-        });
+        } );
 
         if (prop.isRelationship &&
             prop.relationshipType != ManagedRelationshipType.belongsTo) {
@@ -106,7 +107,7 @@ class EntityBuilder {
       if (relationshipsWithThisInverse.length > 1) {
         throw ManagedDataModelErrorImpl.duplicateInverse(
             tableDefinitionTypeName,
-            p.relatedProperty.name,
+            p.relatedProperty!.name,
             relationshipsWithThisInverse.map((r) => r.name).toList());
       }
     });
@@ -115,38 +116,38 @@ class EntityBuilder {
     properties.forEach((p) => p.validate(entityBuilders));
   }
 
-  void link(List<ManagedEntity> entities) {
-    entity.symbolMap = {};
+  void link(List<ManagedEntity?> entities) {
+    entity!.symbolMap = {};
     properties.forEach((p) {
       p.link(entities);
 
-      entity.symbolMap[Symbol(p.name)] = p.name;
-      entity.symbolMap[Symbol("${p.name}=")] = p.name;
+      entity!.symbolMap[Symbol(p.name)] = p.name;
+      entity!.symbolMap[Symbol("${p.name}=")] = p.name;
 
       if (p.isRelationship) {
         relationships[p.name] = p.relationship;
       } else {
         attributes[p.name] = p.attribute;
         if (p.primaryKey) {
-          entity.primaryKey = p.name;
+          entity!.primaryKey = p.name;
         }
       }
     });
 
-    entity.attributes = attributes;
-    entity.relationships = relationships;
-    entity.validators = [];
-    entity.validators.addAll(attributes.values.expand((a) => a.validators));
-    entity.validators.addAll(relationships.values.expand((a) => a.validators));
-    entity.uniquePropertySet =
-        uniquePropertySet?.map((key) => entity.properties[key])?.toList();
+    entity!.attributes = attributes;
+    entity!.relationships = relationships;
+    entity!.validators = [];
+    entity!.validators.addAll(attributes.values.expand((a) => a!.validators));
+    entity!.validators.addAll(relationships.values.expand((a) => a!.validators));
+    entity!.uniquePropertySet =
+        uniquePropertySet?.map((key) => entity!.properties[key]).toList();
   }
 
   PropertyBuilder getInverseOf(PropertyBuilder foreignKey) {
-    final expectedSymbol = foreignKey.relate.inversePropertyName;
+    final expectedSymbol = foreignKey.relate!.inversePropertyName;
     var finder =
         (PropertyBuilder p) => p.declaration.simpleName == expectedSymbol;
-    if (foreignKey.relate.isDeferred) {
+    if (foreignKey.relate!.isDeferred) {
       finder = (p) {
         final propertyType = p.getDeclarationType();
         if (propertyType.isSubtypeOf(reflectType(ManagedSet))) {
@@ -176,14 +177,13 @@ class EntityBuilder {
         " ${candidates.map((p) => p.name).join(", ")}");
   }
 
-  String _getName() {
+  String? _getName() {
     if (metadata?.name != null) {
-      return metadata.name;
+      return metadata!.name;
     }
 
     var declaredTableNameClass = classHierarchyForClass(tableDefinitionType)
-        .firstWhere((cm) => cm.staticMembers[#tableName] != null,
-            orElse: () => null);
+        .firstWhereOrNull((cm) => cm.staticMembers[#tableName] != null);
 
     if (declaredTableNameClass == null) {
       return tableDefinitionTypeName;
@@ -191,7 +191,7 @@ class EntityBuilder {
 
     Logger("aqueduct").warning(
         "Overriding ManagedObject.tableName is deprecated. Use '@Table(name: ...)' instead.");
-    return declaredTableNameClass.invoke(#tableName, []).reflectee as String;
+    return declaredTableNameClass.invoke(#tableName, []).reflectee as String?;
   }
 
   List<PropertyBuilder> _getProperties() {
@@ -211,8 +211,8 @@ class EntityBuilder {
         .map((declaration) => PropertyBuilder(this, declaration))
         .toList();
 
-    if (instanceType.superclass.mixin != instanceType.superclass) {
-      final mixin = instanceType.superclass.mixin.declarations.values
+    if (instanceType.superclass!.mixin != instanceType.superclass) {
+      final mixin = instanceType.superclass!.mixin.declarations.values
           .where(isTransientPropertyOrAccessor)
           .map((declaration) => PropertyBuilder(this, declaration))
           .toList();
@@ -222,7 +222,7 @@ class EntityBuilder {
     final out = <PropertyBuilder>[];
     attributes.forEach((prop) {
       final complement =
-          out.firstWhere((pb) => pb.name == prop.name, orElse: () => null);
+          out.firstWhereOrNull((pb) => pb.name == prop.name);
       if (complement != null) {
         complement.serialize = const Serialize(input: true, output: true);
       } else {
@@ -239,7 +239,7 @@ class EntityBuilder {
 
     return classHierarchyForClass(reflectClass(instanceType))
         .firstWhere(
-            (cm) => !cm.superclass.isSubtypeOf(reflectType(ManagedObject)),
+            (cm) => !cm.superclass!.isSubtypeOf(reflectType(ManagedObject)),
             orElse: () => throw ifNotFoundException)
         .typeArguments
         .first as ClassMirror;

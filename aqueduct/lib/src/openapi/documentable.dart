@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:aqueduct/aqueduct.dart';
-import 'package:open_api/v3.dart';
 
 /// The methods you implement to document OpenAPI components.
 ///
@@ -46,7 +45,7 @@ abstract class APIOperationDocumenter {
   ///
   /// This method is implemented by [Router] to provide the paths of an OpenAPI document
   /// and typically shouldn't be overridden by another controller.
-  Map<String, APIPath> documentPaths(APIDocumentContext context);
+  Map<String, APIPath>? documentPaths(APIDocumentContext context);
 
   /// Tells this object to return all [APIOperation]s it handles.
   ///
@@ -90,7 +89,7 @@ abstract class APIOperationDocumenter {
   ///
   ///         return ops;
   ///       }
-  Map<String, APIOperation> documentOperations(
+  Map<String, APIOperation>? documentOperations(
       APIDocumentContext context, String route, APIPath path);
 }
 
@@ -105,19 +104,19 @@ class APIDocumentContext {
   /// Creates a new context.
   APIDocumentContext(this.document)
       : schema = APIComponentCollection<APISchemaObject>._(
-            "schemas", document.components.schemas),
+            "schemas", document.components!.schemas),
         responses = APIComponentCollection<APIResponse>._(
-            "responses", document.components.responses),
+            "responses", document.components!.responses),
         parameters = APIComponentCollection<APIParameter>._(
-            "parameters", document.components.parameters),
+            "parameters", document.components!.parameters),
         requestBodies = APIComponentCollection<APIRequestBody>._(
-            "requestBodies", document.components.requestBodies),
+            "requestBodies", document.components!.requestBodies),
         headers = APIComponentCollection<APIHeader>._(
-            "headers", document.components.headers),
+            "headers", document.components!.headers),
         securitySchemes = APIComponentCollection<APISecurityScheme>._(
-            "securitySchemes", document.components.securitySchemes),
+            "securitySchemes", document.components!.securitySchemes),
         callbacks = APIComponentCollection<APICallback>._(
-            "callbacks", document.components.callbacks);
+            "callbacks", document.components!.callbacks);
 
   /// The document being created.
   final APIDocument document;
@@ -160,20 +159,20 @@ class APIDocumentContext {
   Future<Map<String, dynamic>> finalize() async {
     final ops = _deferredOperations;
     _deferredOperations = [];
-    await Future.forEach(ops, (op) => op());
+    await Future.forEach(ops, (dynamic op) => op());
 
     document.paths.values
-        .expand((p) => p.operations.values)
+        .expand((p) => p.operations!.values)
         .where((op) => op.security != null)
-        .expand((op) => op.security)
+        .expand((op) => op.security!)
         .forEach((req) {
-      req.requirements.forEach((schemeName, scopes) {
-        final scheme = document.components.securitySchemes[schemeName];
+      req.requirements!.forEach((schemeName, scopes) {
+        final scheme = document.components!.securitySchemes[schemeName]!;
         if (scheme.type == APISecuritySchemeType.oauth2) {
-          scheme.flows.values.forEach((flow) {
+          scheme.flows!.values.forEach((flow) {
             scopes.forEach((scope) {
-              if (!flow.scopes.containsKey(scope)) {
-                flow.scopes[scope] = "";
+              if (!flow.scopes!.containsKey(scope)) {
+                flow.scopes![scope] = "";
               }
             });
           });
@@ -192,7 +191,7 @@ class APIComponentCollection<T extends APIObject> {
   APIComponentCollection._(this._typeName, this._componentMap);
 
   final String _typeName;
-  final Map<String, T> _componentMap;
+  final Map<String?, T> _componentMap;
   final Map<Type, T> _typeReferenceMap = {};
   final Map<Type, Completer<T>> _resolutionMap = {};
 
@@ -203,7 +202,7 @@ class APIComponentCollection<T extends APIObject> {
   ///
   /// If this component is represented by a class, provide it as [representation].
   /// Objects may reference either [name] or [representation] when using a component.
-  void register(String name, T component, {Type representation}) {
+  void register(String? name, T component, {Type? representation}) {
     if (_componentMap.containsKey(name)) {
       return;
     }
@@ -220,7 +219,7 @@ class APIComponentCollection<T extends APIObject> {
       _typeReferenceMap[representation] = refObject;
 
       if (_resolutionMap.containsKey(representation)) {
-        _resolutionMap[representation].complete(refObject);
+        _resolutionMap[representation]!.complete(refObject);
         _resolutionMap.remove(representation);
       }
     }
@@ -239,7 +238,7 @@ class APIComponentCollection<T extends APIObject> {
   /// An object is always returned, even if no component named [name] exists.
   /// If after [APIDocumentContext.finalize] is called and no object
   /// has been registered for [name], an error is thrown.
-  T getObject(String name) {
+  T getObject(String? name) {
     final obj = _getInstanceOf();
     obj.referenceURI = Uri(path: "/components/$_typeName/$name");
     return obj;
@@ -260,7 +259,7 @@ class APIComponentCollection<T extends APIObject> {
             "/components/$_typeName/aqueduct-typeref:$type");
 
     if (_typeReferenceMap.containsKey(type)) {
-      obj.referenceURI = _typeReferenceMap[type].referenceURI;
+      obj.referenceURI = _typeReferenceMap[type]!.referenceURI;
     } else {
       final completer =
           _resolutionMap.putIfAbsent(type, () => Completer<T>.sync());

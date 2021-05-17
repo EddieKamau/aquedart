@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 import 'package:aqueduct/src/dev/helpers.dart';
 
 void main() {
-  ManagedContext context;
+  late ManagedContext context;
 
   setUpAll(() {
     var ps = DefaultPersistentStore();
@@ -90,12 +90,12 @@ void main() {
 
     user.posts = ManagedSet<Post>.from(posts);
 
-    expect(user.posts.length, 3);
-    expect(user.posts.first.owner, user);
-    expect(user.posts.first.text, "A");
+    expect(user.posts!.length, 3);
+    expect(user.posts!.first.owner, user);
+    expect(user.posts!.first.text, "A");
 
     expect(posts.first.owner, user);
-    expect(posts.first.owner.name, "Bob");
+    expect(posts.first.owner!.name, "Bob");
   });
 
   test("Can assign null to relationships", () {
@@ -183,7 +183,7 @@ void main() {
     user.readFromMap(wash(map));
 
     expect(
-        user.dateCreated.difference(DateTime.parse(dateString)), Duration.zero);
+        user.dateCreated!.difference(DateTime.parse(dateString)), Duration.zero);
 
     var remap = user.asMap();
     expect(remap["dateCreated"], dateString);
@@ -219,8 +219,8 @@ void main() {
     var post = Post()..readFromMap(wash(postMap));
     expect(post.text, "hey");
     expect(post.id, 1);
-    expect(post.owner.id, 18);
-    expect(post.owner.name, "Alex");
+    expect(post.owner!.id, 18);
+    expect(post.owner!.name, "Alex");
   });
 
   test("Trying to read embedded object that isnt an object fails", () {
@@ -587,9 +587,9 @@ void main() {
         {"text": "Hi", "id": 1}
       ]
     }));
-    expect(u.posts.length, 1);
-    expect(u.posts[0].id, 1);
-    expect(u.posts[0].text, "Hi");
+    expect(u.posts!.length, 1);
+    expect(u.posts![0].id, 1);
+    expect(u.posts![0].text, "Hi");
   });
 
   test(
@@ -680,7 +680,7 @@ void main() {
 
   group("Private fields", () {
     test("Private fields on entity", () {
-      var entity = context.dataModel.entityForType(PrivateField);
+      var entity = context.dataModel!.entityForType(PrivateField)!;
       expect(entity.attributes["_private"], isNotNull);
     });
 
@@ -768,43 +768,43 @@ void main() {
     final dm = ManagedDataModel([DefaultConstructorHasOptionalArgs]);
     final _ = ManagedContext(dm, null);
     final instance =
-        dm.entityForType(DefaultConstructorHasOptionalArgs).instanceOf();
+        dm.entityForType(DefaultConstructorHasOptionalArgs)!.instanceOf();
     expect(instance is DefaultConstructorHasOptionalArgs, true);
   });
 }
 
 class User extends ManagedObject<_User> implements _User {
   @Serialize()
-  String value;
+  String? value;
 }
 
 class _User {
   @Column(nullable: true)
-  String name;
+  String? name;
 
   @Column(primaryKey: true)
-  int id;
+  int? id;
 
-  DateTime dateCreated;
+  DateTime? dateCreated;
 
-  ManagedSet<Post> posts;
+  ManagedSet<Post>? posts;
 }
 
 class Post extends ManagedObject<_Post> implements _Post {}
 
 class _Post {
   @primaryKey
-  int id;
+  int? id;
 
-  String text;
+  String? text;
 
   @Relate(Symbol('posts'))
-  User owner;
+  User? owner;
 }
 
 class TransientTest extends ManagedObject<_TransientTest>
     implements _TransientTest {
-  String notAnAttribute;
+  String? notAnAttribute;
 
   @Serialize(input: false, output: true)
   String get defaultedText => "Mr. $text";
@@ -820,15 +820,15 @@ class TransientTest extends ManagedObject<_TransientTest>
   }
 
   @Serialize(input: false, output: true)
-  String get outputOnly => text;
+  String? get outputOnly => text;
 
-  set outputOnly(String s) {
+  set outputOnly(String? s) {
     text = s;
   }
 
   // This is intentionally invalid
   @Serialize(input: true, output: false)
-  String get invalidInput => text;
+  String? get invalidInput => text;
 
   // This is intentionally invalid
   @Serialize(input: false, output: true)
@@ -837,35 +837,35 @@ class TransientTest extends ManagedObject<_TransientTest>
   }
 
   @Serialize()
-  String get bothButOnlyOnOne => text;
+  String? get bothButOnlyOnOne => text;
 
-  set bothButOnlyOnOne(String s) {
+  set bothButOnlyOnOne(String? s) {
     text = s;
   }
 
   @Serialize(input: true, output: false)
-  int inputInt;
+  int? inputInt;
 
   @Serialize(input: false, output: true)
-  int outputInt;
+  int? outputInt;
 
   @Serialize()
-  int inOut;
+  int? inOut;
 
   @Serialize()
-  String get bothOverQualified => text;
+  String? get bothOverQualified => text;
 
   @Serialize()
-  set bothOverQualified(String s) {
+  set bothOverQualified(String? s) {
     text = s;
   }
 }
 
 class _TransientTest {
   @primaryKey
-  int id;
+  int? id;
 
-  String text;
+  String? text;
 }
 
 class TransientTypeTest extends ManagedObject<_TransientTypeTest>
@@ -935,7 +935,7 @@ class TransientTypeTest extends ManagedObject<_TransientTypeTest>
   @Serialize(input: true, output: false)
   set transientMap(Map<String, String> m) {
     var pairStrings = m.keys.map((key) {
-      String value = m[key];
+      String? value = m[key];
       return "$key:$value";
     });
 
@@ -953,66 +953,66 @@ class TransientTypeTest extends ManagedObject<_TransientTypeTest>
   }
 
   @Serialize()
-  List<Map<String, dynamic>> deepList;
+  List<Map<String, dynamic>>? deepList;
 
   @Serialize()
-  Map<String, Map<String, int>> deepMap;
+  Map<String, Map<String, int>>? deepMap;
 
   @Serialize()
-  Map<String, dynamic> defaultMap;
+  Map<String, dynamic>? defaultMap;
 
   @Serialize()
-  List<dynamic> defaultList;
+  List<dynamic>? defaultList;
 }
 
 class _TransientTypeTest {
   // All of the types - ManagedPropertyType
   @primaryKey
-  int id;
+  int? id;
 
-  int backingInt;
+  late int backingInt;
 
   @Column(databaseType: ManagedPropertyType.bigInteger)
-  int backingBigInt;
+  late int backingBigInt;
 
-  String backingString;
+  late String backingString;
 
-  DateTime backingDateTime;
+  late DateTime backingDateTime;
 
-  bool backingBool;
+  late bool backingBool;
 
-  double backingDouble;
+  late double backingDouble;
 
-  String backingMapString;
+  late String backingMapString;
 
-  String backingListString;
+  late String backingListString;
 }
 
 class PrivateField extends ManagedObject<_PrivateField>
     implements _PrivateField {
   @Serialize(input: true, output: false)
-  set public(String p) {
+  set public(String? p) {
     _private = p;
   }
 
   @Serialize(input: false, output: true)
-  String get public => _private;
+  String? get public => _private;
 }
 
 class _PrivateField {
   @primaryKey
-  int id;
+  int? id;
 
-  String _private;
+  String? _private;
 }
 
 class EnumObject extends ManagedObject<_EnumObject> implements _EnumObject {}
 
 class _EnumObject {
   @primaryKey
-  int id;
+  int? id;
 
-  EnumValues enumValues;
+  EnumValues? enumValues;
 }
 
 enum EnumValues { abcd, efgh, other18 }
@@ -1025,9 +1025,9 @@ class TransientOwner extends ManagedObject<_TransientOwner>
 
 class _TransientOwner {
   @primaryKey
-  int id;
+  int? id;
 
-  TransientBelongsTo t;
+  TransientBelongsTo? t;
 }
 
 class TransientBelongsTo extends ManagedObject<_TransientBelongsTo>
@@ -1035,10 +1035,10 @@ class TransientBelongsTo extends ManagedObject<_TransientBelongsTo>
 
 class _TransientBelongsTo {
   @primaryKey
-  int id;
+  int? id;
 
   @Relate(Symbol('t'))
-  TransientOwner owner;
+  TransientOwner? owner;
 }
 
 void expectError(ValidationException exception, Matcher matcher) {
@@ -1050,9 +1050,9 @@ class DocumentTest extends ManagedObject<_DocumentTest>
 
 class _DocumentTest {
   @primaryKey
-  int id;
+  int? id;
 
-  Document document;
+  late Document document;
 }
 
 class ConstructorOverride extends ManagedObject<_ConstructorOverride>
@@ -1064,68 +1064,68 @@ class ConstructorOverride extends ManagedObject<_ConstructorOverride>
 
 class _ConstructorOverride {
   @primaryKey
-  int id;
+  int? id;
 
-  String value;
+  String? value;
 }
 
 class DefaultConstructorHasOptionalArgs
     extends ManagedObject<_ConstructorTableDef> {
   // ignore: avoid_unused_constructor_parameters
-  DefaultConstructorHasOptionalArgs({int foo});
+  DefaultConstructorHasOptionalArgs({int? foo});
 }
 
 class _ConstructorTableDef {
   @primaryKey
-  int id;
+  int? id;
 }
 
 class Top extends ManagedObject<_Top> implements _Top {}
 
 class _Top {
   @Column(primaryKey: true)
-  int id;
+  int? id;
 
-  ManagedSet<Middle> middles;
+  late ManagedSet<Middle> middles;
 }
 
 class Middle extends ManagedObject<_Middle> implements _Middle {}
 
 class _Middle {
   @Column(primaryKey: true)
-  int id;
+  int? id;
 
   @Relate(#middles)
-  Top top;
+  Top? top;
 
-  Bottom bottom;
-  ManagedSet<Bottom> bottoms;
+  late Bottom bottom;
+  late ManagedSet<Bottom> bottoms;
 }
 
 class Bottom extends ManagedObject<_Bottom> implements _Bottom {}
 
 class _Bottom {
   @Column(primaryKey: true)
-  int id;
+  int? id;
 
   @Relate(#bottom)
-  Middle middle;
+  Middle? middle;
 
   @Relate(#bottoms)
-  Middle middles;
+  Middle? middles;
 }
 
 class OverrideField extends ManagedObject<_OverrideField>
     implements _OverrideField {
   @override
-  String field;
+  String? field;
 }
 
 class _OverrideField {
   @primaryKey
-  int id;
+  int? id;
 
-  String field;
+  String? field;
 }
 
 T wash<T>(dynamic data) {

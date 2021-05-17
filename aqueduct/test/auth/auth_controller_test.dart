@@ -9,8 +9,8 @@ import 'package:aqueduct_test/aqueduct_test.dart';
 import 'package:aqueduct/src/dev/helpers.dart';
 
 void main() {
-  HttpServer server;
-  AuthServer authenticationServer;
+  HttpServer? server;
+  late AuthServer authenticationServer;
   Router router;
   ////////////
 
@@ -27,7 +27,7 @@ void main() {
 
     server =
         await HttpServer.bind("localhost", 8888, v6Only: false, shared: false);
-    server.map((req) => Request(req)).listen(router.receive);
+    server!.map((req) => Request(req)).listen(router.receive);
   });
 
   tearDown(() async {
@@ -206,8 +206,8 @@ void main() {
     });
 
     test("Username is repeated returns 400", () async {
-      var encodedUsername = Uri.encodeQueryComponent(user1["username"]);
-      var encodedPassword = Uri.encodeQueryComponent(user1["password"]);
+      var encodedUsername = Uri.encodeQueryComponent(user1["username"]!);
+      var encodedPassword = Uri.encodeQueryComponent(user1["password"]!);
       var encodedWrongUsername = Uri.encodeQueryComponent("!@#kjasd");
       final client = Agent.onPort(8888)
         ..headers["authorization"] =
@@ -251,8 +251,8 @@ void main() {
     });
 
     test("password is repeated returns 400", () async {
-      var encodedUsername = Uri.encodeQueryComponent(user1["username"]);
-      var encodedPassword = Uri.encodeQueryComponent(user1["password"]);
+      var encodedUsername = Uri.encodeQueryComponent(user1["username"]!);
+      var encodedPassword = Uri.encodeQueryComponent(user1["password"]!);
       var encodedWrongPassword = Uri.encodeQueryComponent("!@#kjasd");
 
       final client = Agent.onPort(8888)
@@ -299,7 +299,7 @@ void main() {
     test("code is duplicated", () async {
       var code = await authenticationServer.authenticateForCode(
           user1["username"], user1["password"], "com.stablekernel.redirect");
-      var encodedCode = Uri.encodeQueryComponent(code.code);
+      var encodedCode = Uri.encodeQueryComponent(code.code!);
 
       final client = Agent.onPort(8888)
         ..setBasicAuthorization("com.stablekernel.redirect", "mckinley");
@@ -331,7 +331,7 @@ void main() {
   });
 
   group("grant_type Failure Cases", () {
-    Agent client;
+    late Agent client;
 
     setUp(() {
       client = Agent.onPort(8888)
@@ -386,7 +386,7 @@ void main() {
   });
 
   group("refresh_token Failure Cases", () {
-    Agent client;
+    late Agent client;
 
     setUp(() {
       client = Agent.onPort(8888)
@@ -455,7 +455,7 @@ void main() {
   });
 
   group("Authorization Header Failure Cases (password grant_type)", () {
-    Agent client;
+    late Agent client;
 
     setUp(() {
       client = Agent.onPort(8888);
@@ -513,8 +513,8 @@ void main() {
   });
 
   group("Authorization Header Failure Cases (refresh_token grant_type)", () {
-    String refreshTokenString;
-    Agent client;
+    String? refreshTokenString;
+    late Agent client;
 
     setUp(() async {
       client = Agent.onPort(8888);
@@ -579,8 +579,8 @@ void main() {
 
   group("Authorization Header Failure Cases (authorization_code grant_type)",
       () {
-    String code;
-    Agent client;
+    String? code;
+    late Agent client;
 
     setUp(() async {
       client = Agent.onPort(8888);
@@ -639,7 +639,7 @@ void main() {
 
       var m = {
         "grant_type": "authorization_code",
-        "code": Uri.encodeQueryComponent(code.code),
+        "code": Uri.encodeQueryComponent(code.code!),
         "scope": "other_scope"
       };
 
@@ -686,7 +686,7 @@ void main() {
 }
 
 Map<String, String> substituteUser(Map<String, String> initial,
-    {String username, String password}) {
+    {String? username, String? password}) {
   var m = Map<String, String>.from(initial);
 
   if (username != null) {
@@ -699,7 +699,7 @@ Map<String, String> substituteUser(Map<String, String> initial,
   return m;
 }
 
-Map<String, String> refreshTokenMapFromTokenResponse(TestResponse resp) {
+Map<String, String?> refreshTokenMapFromTokenResponse(TestResponse resp) {
   return {
     "refresh_token":
         resp.body.as<Map<String, dynamic>>()["refresh_token"] as String
@@ -773,7 +773,7 @@ Future<TestResponse> grant(
 }
 
 Future<TestResponse> refresh(
-    String clientID, String clientSecret, Map<String, String> form) {
+    String clientID, String clientSecret, Map<String, String?> form) {
   Agent client = Agent.onPort(8888)
     ..setBasicAuthorization(clientID, clientSecret);
 
@@ -788,7 +788,7 @@ Future<TestResponse> refresh(
 }
 
 Future<TestResponse> exchange(
-    String clientID, String clientSecret, String code) {
+    String clientID, String clientSecret, String? code) {
   Agent client = Agent.onPort(8888)
     ..setBasicAuthorization(clientID, clientSecret);
 

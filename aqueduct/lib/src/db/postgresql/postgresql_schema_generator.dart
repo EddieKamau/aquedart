@@ -14,7 +14,7 @@ class PostgreSQLSchemaGenerator {
 
     var indexCommands = table.columns
         .where((col) =>
-            col.isIndexed && !col.isPrimaryKey) // primary keys are auto-indexed
+            col.isIndexed! && !col.isPrimaryKey!) // primary keys are auto-indexed
         .map((col) => addIndexToColumn(table, col))
         .expand((commands) => commands);
     commands.addAll(indexCommands);
@@ -41,8 +41,8 @@ class PostgreSQLSchemaGenerator {
   }
 
   List<String> addTableUniqueColumnSet(SchemaTable table) {
-    var colNames = table.uniqueColumnSet
-        .map((name) => _columnNameForColumn(table[name]))
+    var colNames = table.uniqueColumnSet!
+        .map((name) => _columnNameForColumn(table[name]!))
         .join(",");
     return [
       "CREATE UNIQUE INDEX ${table.name}_unique_idx ON ${table.name} ($colNames)"
@@ -54,7 +54,7 @@ class PostgreSQLSchemaGenerator {
   }
 
   List<String> addColumn(SchemaTable table, SchemaColumn column,
-      {String unencodedInitialValue}) {
+      {String? unencodedInitialValue}) {
     var commands = <String>[];
 
     if (unencodedInitialValue != null) {
@@ -69,7 +69,7 @@ class PostgreSQLSchemaGenerator {
       ]);
     }
 
-    if (column.isIndexed) {
+    if (column.isIndexed!) {
       commands.addAll(addIndexToColumn(table, column));
     }
 
@@ -87,14 +87,14 @@ class PostgreSQLSchemaGenerator {
   }
 
   List<String> renameColumn(
-      SchemaTable table, SchemaColumn column, String name) {
+      SchemaTable table, SchemaColumn column, String? name) {
     // Must rename indices, constraints, etc.
     throw UnsupportedError("renameColumn is not yet supported.");
   }
 
   List<String> alterColumnNullability(
-      SchemaTable table, SchemaColumn column, String unencodedInitialValue) {
-    if (column.isNullable) {
+      SchemaTable table, SchemaColumn column, String? unencodedInitialValue) {
+    if (column.isNullable!) {
       return [
         "ALTER TABLE ${table.name} ALTER COLUMN ${_columnNameForColumn(column)} DROP NOT NULL"
       ];
@@ -113,7 +113,7 @@ class PostgreSQLSchemaGenerator {
   }
 
   List<String> alterColumnUniqueness(SchemaTable table, SchemaColumn column) {
-    if (column.isUnique) {
+    if (column.isUnique!) {
       return ["ALTER TABLE ${table.name} ADD UNIQUE (${column.name})"];
     } else {
       return [
@@ -160,15 +160,15 @@ class PostgreSQLSchemaGenerator {
 
   ////
 
-  String _uniqueKeyName(String tableName, SchemaColumn column) {
+  String _uniqueKeyName(String? tableName, SchemaColumn column) {
     return "${tableName}_${_columnNameForColumn(column)}_key";
   }
 
-  String _foreignKeyName(String tableName, SchemaColumn column) {
+  String _foreignKeyName(String? tableName, SchemaColumn column) {
     return "${tableName}_${_columnNameForColumn(column)}_fkey";
   }
 
-  List<String> _addConstraintsForColumn(String tableName, SchemaColumn column) {
+  List<String> _addConstraintsForColumn(String? tableName, SchemaColumn column) {
     return [
       "ALTER TABLE ONLY $tableName ADD FOREIGN KEY (${_columnNameForColumn(column)}) "
           "REFERENCES ${column.relatedTableName} (${column.relatedColumnName}) "
@@ -176,20 +176,20 @@ class PostgreSQLSchemaGenerator {
     ];
   }
 
-  String _indexNameForColumn(String tableName, SchemaColumn column) {
+  String _indexNameForColumn(String? tableName, SchemaColumn column) {
     return "${tableName}_${_columnNameForColumn(column)}_idx";
   }
 
   String _columnStringForColumn(SchemaColumn col) {
     var elements = [_columnNameForColumn(col), _postgreSQLTypeForColumn(col)];
-    if (col.isPrimaryKey) {
+    if (col.isPrimaryKey!) {
       elements.add("PRIMARY KEY");
     } else {
-      elements.add(col.isNullable ? "NULL" : "NOT NULL");
+      elements.add(col.isNullable! ? "NULL" : "NOT NULL");
       if (col.defaultValue != null) {
         elements.add("DEFAULT ${col.defaultValue}");
       }
-      if (col.isUnique) {
+      if (col.isUnique!) {
         elements.add("UNIQUE");
       }
     }
@@ -197,7 +197,7 @@ class PostgreSQLSchemaGenerator {
     return elements.join(" ");
   }
 
-  String _columnNameForColumn(SchemaColumn column) {
+  String? _columnNameForColumn(SchemaColumn column) {
     if (column.relatedColumnName != null) {
       return "${column.name}_${column.relatedColumnName}";
     }
@@ -205,7 +205,7 @@ class PostgreSQLSchemaGenerator {
     return column.name;
   }
 
-  String _deleteRuleStringForDeleteRule(String deleteRule) {
+  String? _deleteRuleStringForDeleteRule(String? deleteRule) {
     switch (deleteRule) {
       case "cascade":
         return "CASCADE";
@@ -220,24 +220,22 @@ class PostgreSQLSchemaGenerator {
     return null;
   }
 
-  String _postgreSQLTypeForColumn(SchemaColumn t) {
+  String? _postgreSQLTypeForColumn(SchemaColumn t) {
     switch (t.typeString) {
       case "integer":
         {
-          if (t.autoincrement) {
+          if (t.autoincrement!) {
             return "SERIAL";
           }
           return "INT";
         }
-        break;
       case "bigInteger":
         {
-          if (t.autoincrement) {
+          if (t.autoincrement!) {
             return "BIGSERIAL";
           }
           return "BIGINT";
         }
-        break;
       case "string":
         return "TEXT";
       case "datetime":

@@ -11,7 +11,7 @@ import 'package:test/test.dart';
 
 void main() {
   group("Cooperation", () {
-    PersistentStore store;
+    late PersistentStore store;
 
     setUp(() {
       store = PostgreSQLPersistentStore(
@@ -46,19 +46,19 @@ void main() {
 
       var mig = Migration1();
       mig.version = 1;
-      final outSchema = await store.upgrade(schema, [mig], temporary: true);
+      final outSchema = await (store.upgrade(schema, [mig], temporary: true) as FutureOr<Schema>);
 
       // 'Sync up' that schema to compare it
-      final tableToKeep = schema.tableForName("tableToKeep");
+      final tableToKeep = schema.tableForName("tableToKeep")!;
       tableToKeep.addColumn(SchemaColumn(
           "addedColumn", ManagedPropertyType.integer,
           defaultValue: "2"));
-      tableToKeep.removeColumn(tableToKeep.columnForName("columnToDelete"));
+      tableToKeep.removeColumn(tableToKeep.columnForName("columnToDelete")!);
       tableToKeep
-          .columnForName("columnToEdit")
+          .columnForName("columnToEdit")!
           .defaultValue = "'foo'";
 
-      schema.removeTable(schema.tableForName("tableToDelete"));
+      schema.removeTable(schema.tableForName("tableToDelete")!);
 
       schema.addTable(SchemaTable("foo", [
         SchemaColumn("foobar", ManagedPropertyType.integer, isIndexed: true)
@@ -111,7 +111,7 @@ class Migration1 extends Migration { @override Future upgrade() async {} @overri
       var mock = MockMigratable(temporaryDirectory);
       var files = mock.projectMigrations;
       expect(files.length, 1);
-      expect(files.first.uri.pathSegments.last, "00000001.migration.dart");
+      expect(files.first.uri!.pathSegments.last, "00000001.migration.dart");
     });
 
     test("Migration files are ordered correctly", () async {
@@ -127,11 +127,11 @@ class Migration1 extends Migration { @override Future upgrade() async {} @overri
       var mock = MockMigratable(temporaryDirectory);
       var files = mock.projectMigrations;
       expect(files.length, 5);
-      expect(files[0].uri.pathSegments.last, "00000001.migration.dart");
-      expect(files[1].uri.pathSegments.last, "2.migration.dart");
-      expect(files[2].uri.pathSegments.last, "03_Foo.migration.dart");
-      expect(files[3].uri.pathSegments.last, "000001001.migration.dart");
-      expect(files[4].uri.pathSegments.last, "10001_.migration.dart");
+      expect(files[0].uri!.pathSegments.last, "00000001.migration.dart");
+      expect(files[1].uri!.pathSegments.last, "2.migration.dart");
+      expect(files[2].uri!.pathSegments.last, "03_Foo.migration.dart");
+      expect(files[3].uri!.pathSegments.last, "000001001.migration.dart");
+      expect(files[4].uri!.pathSegments.last, "10001_.migration.dart");
     });
   });
 }
@@ -172,7 +172,7 @@ class MockMigratable extends CLICommand
   }
 
   @override
-  Directory migrationDirectory;
+  Directory? migrationDirectory;
 
   @override
   Directory projectDirectory;

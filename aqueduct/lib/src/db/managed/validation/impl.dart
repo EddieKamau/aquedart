@@ -17,19 +17,19 @@ class ValidationExpression {
   dynamic value;
 
   void compare(ValidationContext context, dynamic input) {
-    final comparisonValue = value as Comparable;
+    final comparisonValue = value as Comparable?;
 
     switch (operator) {
       case ValidationOperator.equalTo:
         {
-          if (comparisonValue.compareTo(input) != 0) {
+          if (comparisonValue!.compareTo(input) != 0) {
             context.addError("must be equal to '$comparisonValue'.");
           }
         }
         break;
       case ValidationOperator.greaterThan:
         {
-          if (comparisonValue.compareTo(input) >= 0) {
+          if (comparisonValue!.compareTo(input) >= 0) {
             context.addError("must be greater than '$comparisonValue'.");
           }
         }
@@ -37,7 +37,7 @@ class ValidationExpression {
 
       case ValidationOperator.greaterThanEqualTo:
         {
-          if (comparisonValue.compareTo(input) > 0) {
+          if (comparisonValue!.compareTo(input) > 0) {
             context.addError(
               "must be greater than or equal to '$comparisonValue'.");
           }
@@ -46,14 +46,14 @@ class ValidationExpression {
 
       case ValidationOperator.lessThan:
         {
-          if (comparisonValue.compareTo(input) <= 0) {
+          if (comparisonValue!.compareTo(input) <= 0) {
             context.addError("must be less than to '$comparisonValue'.");
           }
         }
         break;
       case ValidationOperator.lessThanEqualTo:
         {
-          if (comparisonValue.compareTo(input) < 0) {
+          if (comparisonValue!.compareTo(input) < 0) {
             context
               .addError("must be less than or equal to '$comparisonValue'.");
           }

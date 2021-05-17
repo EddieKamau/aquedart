@@ -3,7 +3,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:command_line_agent/command_line_agent.dart';
+import 'package:cli_agent/cli_agent.dart';
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
 import 'package:yaml/yaml.dart' as yaml;
@@ -22,9 +22,9 @@ File get keyFile => File.fromUri(Directory.current.uri
     .resolve("aqueduct.key.pem"));
 
 void main() {
-  CLIClient templateCli;
-  CLIClient projectUnderTestCli;
-  CLITask task;
+  late CLIClient templateCli;
+  late CLIClient projectUnderTestCli;
+  late CLITask task;
 
   setUpAll(() async {
     templateCli = await CLIClient(CommandLineAgent(ProjectAgent.projectsDirectory)).createProject();
@@ -36,7 +36,7 @@ void main() {
   });
 
   tearDown(() async {
-    await task?.process?.stop(0);
+    await task.process?.stop(0);
   });
 
   tearDownAll(ProjectAgent.tearDownAll);
@@ -55,11 +55,11 @@ void main() {
     expect(projectUnderTestCli.output, contains("CLI Version: $thisVersion"));
     expect(projectUnderTestCli.output, contains("Aqueduct project version: $thisVersion"));
 
-    var result = await http.get("http://localhost:8888/example");
+    var result = await http.get(Uri.parse("http://localhost:8888/example"));
     expect(result.statusCode, 200);
 
     // ignore: unawaited_futures
-    task.process.stop(0);
+    task.process!.stop(0);
     expect(await task.exitCode, 0);
   });
 
@@ -212,7 +212,7 @@ static Future initializeApplication(ApplicationOptions x) async { throw new Exce
         "serve", ["--config-path", "foobar.yaml", "-n", "1"]);
     await task.hasStarted;
 
-    var result = await http.get("http://localhost:8888/example");
+    var result = await http.get(Uri.parse("http://localhost:8888/example"));
     expect(result.body, contains("key: value"));
   });
 
@@ -235,7 +235,7 @@ static Future initializeApplication(ApplicationOptions x) async { throw new Exce
     ]);
     await task.hasStarted;
 
-    var result = await http.get("http://localhost:8888/example");
+    var result = await http.get(Uri.parse("http://localhost:8888/example"));
     expect(result.body, contains("key: value"));
   });
 }

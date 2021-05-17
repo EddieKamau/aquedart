@@ -6,8 +6,8 @@ import 'package:test/test.dart';
 
 void main() {
   group("Behavior", () {
-    PostgreSQLPersistentStore persistentStore;
-    SocketProxy proxy;
+    late PostgreSQLPersistentStore persistentStore;
+    late SocketProxy proxy;
 
     setUp(() async {
       persistentStore = PostgreSQLPersistentStore(
@@ -15,8 +15,8 @@ void main() {
     });
 
     tearDown(() async {
-      await persistentStore?.close();
-      await proxy?.close();
+      await persistentStore.close();
+      await proxy.close();
     });
 
     test("A down connection will restart", () async {
@@ -138,7 +138,7 @@ class SocketProxy {
 
   bool isEnabled = true;
 
-  ServerSocket _server;
+  late ServerSocket _server;
   List<SocketPair> _pairs = [];
 
   Future open() async {
@@ -166,8 +166,8 @@ class SocketProxy {
   Future close() async {
     await _server.close();
     await Future.wait(_pairs.map((sp) async {
-      await sp.src?.close();
-      await sp.dest?.close();
+      await sp.src.close();
+      await sp.dest.close();
     }));
   }
 }

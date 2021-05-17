@@ -11,7 +11,7 @@ class CLISetup extends CLICommand with CLIProject {
   @Option("heroku",
       help:
           "DEPRECATED. Please see https://aqueduct.io/docs/deploy/deploy_heroku/.")
-  String get herokuName => decode("heroku");
+  String? get herokuName => decode("heroku");
 
   @Flag("tests",
       help:

@@ -10,9 +10,9 @@ import 'package:aqueduct/src/dev/context_helpers.dart';
 // have scope rules.
 void main() {
   RoleBasedAuthStorage storage;
-  ManagedContext context;
-  AuthServer auth;
-  List<User> createdUsers;
+  ManagedContext? context;
+  late AuthServer auth;
+  late List<User> createdUsers;
 
   setUpAll(() async {
     context =
@@ -33,11 +33,11 @@ void main() {
         .map((ac) => ManagedAuthClient()
           ..id = ac.id
           ..salt = ac.salt
-          ..allowedScope = ac.allowedScopes.map((a) => a.toString()).join(" ")
+          ..allowedScope = ac.allowedScopes!.map((a) => a.toString()).join(" ")
           ..hashedSecret = ac.hashedSecret
           ..redirectURI = ac.redirectURI)
         .map((mc) {
-      var q = Query<ManagedAuthClient>(context)..values = mc;
+      var q = Query<ManagedAuthClient>(context!)..values = mc;
       return q.insert();
     }));
   });
@@ -56,9 +56,9 @@ void main() {
           "a",
           requestedScopes: [AuthScope("user"), AuthScope("location:add")]);
 
-      expect(t.scopes.length, 2);
-      expect(t.scopes.any((s) => s.isExactly("user")), true);
-      expect(t.scopes.any((s) => s.isExactly("location:add")), true);
+      expect(t.scopes!.length, 2);
+      expect(t.scopes!.any((s) => s.isExactly("user")), true);
+      expect(t.scopes!.any((s) => s.isExactly("location:add")), true);
     });
 
     test("Restricted role scopes prevents allowed client scopes", () async {
@@ -69,8 +69,8 @@ void main() {
           "a",
           requestedScopes: [AuthScope("user"), AuthScope("location:add")]);
 
-      expect(t.scopes.length, 1);
-      expect(t.scopes.any((s) => s.isExactly("user")), true);
+      expect(t.scopes!.length, 1);
+      expect(t.scopes!.any((s) => s.isExactly("user")), true);
     });
 
     test(
@@ -117,9 +117,9 @@ void main() {
             AuthScope("location:add:xyz")
           ]);
 
-      expect(t.scopes.length, 2);
-      expect(t.scopes.any((s) => s.isExactly("user.readonly")), true);
-      expect(t.scopes.any((s) => s.isExactly("location:add:xyz")), true);
+      expect(t.scopes!.length, 2);
+      expect(t.scopes!.any((s) => s.isExactly("user.readonly")), true);
+      expect(t.scopes!.any((s) => s.isExactly("location:add:xyz")), true);
     });
 
     test("User allowed scopes can't grant higher privileges than client",
@@ -188,9 +188,9 @@ void main() {
           ]);
 
       t = await auth.refresh(t.refreshToken, t.clientID, "a");
-      expect(t.scopes.length, 2);
-      expect(t.scopes.any((s) => s.isExactly("user.readonly")), true);
-      expect(t.scopes.any((s) => s.isExactly("location:add:xyz")), true);
+      expect(t.scopes!.length, 2);
+      expect(t.scopes!.any((s) => s.isExactly("user.readonly")), true);
+      expect(t.scopes!.any((s) => s.isExactly("location:add:xyz")), true);
     });
   });
 
@@ -203,9 +203,9 @@ void main() {
           requestedScopes: [AuthScope("user"), AuthScope("location:add")]);
       var t = await auth.exchange(code.code, "redirect", "a");
 
-      expect(t.scopes.length, 2);
-      expect(t.scopes.any((s) => s.isExactly("user")), true);
-      expect(t.scopes.any((s) => s.isExactly("location:add")), true);
+      expect(t.scopes!.length, 2);
+      expect(t.scopes!.any((s) => s.isExactly("user")), true);
+      expect(t.scopes!.any((s) => s.isExactly("location:add")), true);
     });
 
     test("Restricted role scopes prevents allowed client scopes", () async {
@@ -216,8 +216,8 @@ void main() {
           requestedScopes: [AuthScope("user"), AuthScope("location:add")]);
       var t = await auth.exchange(code.code, "redirect", "a");
 
-      expect(t.scopes.length, 1);
-      expect(t.scopes.any((s) => s.isExactly("user")), true);
+      expect(t.scopes!.length, 1);
+      expect(t.scopes!.any((s) => s.isExactly("user")), true);
     });
 
     test(
@@ -262,9 +262,9 @@ void main() {
           ]);
       var t = await auth.exchange(code.code, "redirect", "a");
 
-      expect(t.scopes.length, 2);
-      expect(t.scopes.any((s) => s.isExactly("user.readonly")), true);
-      expect(t.scopes.any((s) => s.isExactly("location:add:xyz")), true);
+      expect(t.scopes!.length, 2);
+      expect(t.scopes!.any((s) => s.isExactly("user.readonly")), true);
+      expect(t.scopes!.any((s) => s.isExactly("location:add:xyz")), true);
     });
 
     test("User allowed scopes can't grant higher privileges than client",
@@ -290,10 +290,10 @@ class User extends ManagedObject<_User>
 
 class _User extends ResourceOwnerTableDefinition {
   @Column(nullable: true)
-  String role;
+  String? role;
 }
 
-Future<List<User>> createUsers(ManagedContext ctx, int count) async {
+Future<List<User>> createUsers(ManagedContext? ctx, int count) async {
   var list = <User>[];
   for (int i = 0; i < count; i++) {
     var salt = AuthUtility.generateRandomSalt();
@@ -303,19 +303,19 @@ Future<List<User>> createUsers(ManagedContext ctx, int count) async {
       ..hashedPassword =
           AuthUtility.generatePasswordHash(User.defaultPassword, salt);
 
-    if (u.username.startsWith("bob+0")) {
+    if (u.username!.startsWith("bob+0")) {
       u.role = "admin";
-    } else if (u.username.startsWith("bob+1")) {
+    } else if (u.username!.startsWith("bob+1")) {
       u.role = "user";
-    } else if (u.username.startsWith("bob+2")) {
+    } else if (u.username!.startsWith("bob+2")) {
       u.role = "viewer";
-    } else if (u.username.startsWith("bob+3")) {
+    } else if (u.username!.startsWith("bob+3")) {
       u.role = null;
-    } else if (u.username.startsWith("bob+4")) {
+    } else if (u.username!.startsWith("bob+4")) {
       u.role = "invalid";
     }
 
-    var q = Query<User>(ctx)..values = u;
+    var q = Query<User>(ctx!)..values = u;
 
     list.add(await q.insert());
   }
@@ -323,12 +323,12 @@ Future<List<User>> createUsers(ManagedContext ctx, int count) async {
 }
 
 class RoleBasedAuthStorage extends ManagedAuthDelegate<User> {
-  RoleBasedAuthStorage(ManagedContext context, {int tokenLimit = 40})
+  RoleBasedAuthStorage(ManagedContext? context, {int tokenLimit = 40})
       : super(context, tokenLimit: tokenLimit);
 
   @override
-  Future<User> getResourceOwner(AuthServer server, String username) {
-    var query = Query<User>(context)
+  Future<User?> getResourceOwner(AuthServer server, String username) {
+    var query = Query<User>(context!)
       ..where((o) => o.username).equalTo(username)
       ..returningProperties(
           (t) => [t.id, t.hashedPassword, t.salt, t.username, t.role]);

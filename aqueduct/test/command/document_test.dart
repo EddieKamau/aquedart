@@ -2,13 +2,13 @@
 @Tags(const ["cli"])
 import 'dart:convert';
 
-import 'package:command_line_agent/command_line_agent.dart';
+import 'package:cli_agent/cli_agent.dart';
 import 'package:test/test.dart';
 
 import '../not_tests/cli_helpers.dart';
 
 void main() {
-  CLIClient terminal;
+  late CLIClient terminal;
 
   setUpAll(() async {
     await CLIClient.activateCLI();

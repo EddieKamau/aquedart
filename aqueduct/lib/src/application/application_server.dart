@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:aqueduct/src/application/channel.dart';
 import 'package:logging/logging.dart';
-import 'package:runtime/runtime.dart';
+import 'package:replica/replica.dart';
 
 import '../http/controller.dart';
 import '../http/request.dart';
@@ -29,20 +29,20 @@ class ApplicationServer {
   ApplicationOptions options;
 
   /// The underlying [HttpServer].
-  HttpServer server;
+  late HttpServer server;
 
   /// The instance of [ApplicationChannel] serving requests.
-  ApplicationChannel channel;
+  late ApplicationChannel channel;
 
   /// The cached entrypoint of [channel].
-  Controller entryPoint;
+  late Controller entryPoint;
 
   final Type channelType;
 
   /// Target for sending messages to other [ApplicationChannel.messageHub]s.
   ///
   /// Events are added to this property by instances of [ApplicationMessageHub] and should not otherwise be used.
-  EventSink<dynamic> hubSink;
+  EventSink<dynamic>? hubSink;
 
   /// Whether or not this server requires an HTTPS listener.
   bool get requiresHTTPS => _requiresHTTPS;
@@ -92,9 +92,9 @@ class ApplicationServer {
   /// Closes this HTTP server and channel.
   Future close() async {
     logger.fine("ApplicationServer($identifier).close Closing HTTP listener");
-    await server?.close(force: true);
+    await server.close(force: true);
     logger.fine("ApplicationServer($identifier).close Closing channel");
-    await channel?.close();
+    await channel.close();
 
     // This is actually closed by channel.messageHub.close, but this shuts up the analyzer.
     hubSink?.close();

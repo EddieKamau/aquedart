@@ -55,13 +55,13 @@ class CLIDatabaseGenerate extends CLICommand
   Future<int> handle() async {
     var existingMigrations = projectMigrations;
 
-    var newMigrationFile = File.fromUri(migrationDirectory.uri.resolve(
+    var newMigrationFile = File.fromUri(migrationDirectory!.uri.resolve(
         "00000001_${migrationName != "unnamed" ? migrationName : "initial"}.migration.dart"));
     var versionNumber = 1;
 
     if (existingMigrations.isNotEmpty) {
       versionNumber = existingMigrations.last.versionNumber + 1;
-      newMigrationFile = File.fromUri(migrationDirectory.uri.resolve(
+      newMigrationFile = File.fromUri(migrationDirectory!.uri.resolve(
           "${"$versionNumber".padLeft(8, "0")}_${migrationName}.migration.dart"));
     }
 
@@ -70,7 +70,7 @@ class CLIDatabaseGenerate extends CLICommand
         await generateMigrationFileForProject(this, schema, versionNumber);
 
     displayInfo("The following ManagedObject<T> subclasses were found:");
-    displayProgress("${result.tablesEvaluated.join(", ")}");
+    displayProgress("${result.tablesEvaluated!.join(", ")}");
     displayProgress("");
     displayProgress(
         "* If you were expecting more declarations, ensure the files are visible in the application library file.");
@@ -78,7 +78,7 @@ class CLIDatabaseGenerate extends CLICommand
 
     result.changeList?.forEach(displayProgress);
 
-    newMigrationFile.writeAsStringSync(result.source);
+    newMigrationFile.writeAsStringSync(result.source!);
 
     displayInfo("Created new migration file (version $versionNumber).",
         color: CLIColor.boldGreen);

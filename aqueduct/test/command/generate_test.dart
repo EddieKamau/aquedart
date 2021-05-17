@@ -1,13 +1,13 @@
 // ignore: unnecessary_const
 @Tags(const ["cli"])
 import 'dart:io';
-import 'package:command_line_agent/command_line_agent.dart';
+import 'package:cli_agent/cli_agent.dart';
 import 'package:test/test.dart';
 import '../not_tests/cli_helpers.dart';
 
 void main() {
-  CLIClient templateCli;
-  CLIClient projectUnderTestCli;
+  late CLIClient templateCli;
+  late CLIClient projectUnderTestCli;
 
   setUpAll(() async {
     templateCli = await CLIClient(CommandLineAgent(ProjectAgent.projectsDirectory)).createProject();

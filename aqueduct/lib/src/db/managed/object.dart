@@ -33,7 +33,7 @@ abstract class ManagedBacking {
   /// Removes a property from this instance.
   ///
   /// Use this method to use any reference of a property from this instance.
-  void removeProperty(String propertyName) {
+  void removeProperty(String? propertyName) {
     contents.remove(propertyName);
   }
 
@@ -82,7 +82,7 @@ abstract class ManagedObject<T> extends Serializable {
   ManagedBacking backing = ManagedValueBacking();
 
   /// Retrieves a value by property name from [backing].
-  dynamic operator [](String propertyName) {
+  dynamic operator [](String? propertyName) {
     final prop = entity.properties[propertyName];
     if (prop == null) {
       throw ArgumentError("Invalid property access for '${entity.name}'. "
@@ -93,7 +93,7 @@ abstract class ManagedObject<T> extends Serializable {
   }
 
   /// Sets a value by property name in [backing].
-  void operator []=(String propertyName, dynamic value) {
+  void operator []=(String? propertyName, dynamic value) {
     final prop = entity.properties[propertyName];
     if (prop == null) {
       throw ArgumentError("Invalid property access for '${entity.name}'. "
@@ -106,7 +106,7 @@ abstract class ManagedObject<T> extends Serializable {
   /// Removes a property from [backing].
   ///
   /// This will remove a value from the backing map.
-  void removePropertyFromBackingMap(String propertyName) {
+  void removePropertyFromBackingMap(String? propertyName) {
     backing.removeProperty(propertyName);
   }
 
@@ -186,7 +186,7 @@ abstract class ManagedObject<T> extends Serializable {
 
   @override
   dynamic noSuchMethod(Invocation invocation) {
-    final propertyName = entity.runtime.getPropertyName(invocation, entity);
+    final propertyName = entity.runtime!.getPropertyName(invocation, entity);
     if (propertyName != null) {
       if (invocation.isGetter) {
         return this[propertyName];
@@ -217,7 +217,7 @@ abstract class ManagedObject<T> extends Serializable {
           backing.setValueForProperty(
               property, property.convertFromPrimitiveValue(v));
         } else {
-          if (!property.transientStatus.isAvailableAsInput) {
+          if (!property.transientStatus!.isAvailableAsInput) {
             throw ValidationException(["invalid input key '$key'"]);
           }
 
@@ -227,7 +227,7 @@ abstract class ManagedObject<T> extends Serializable {
             throw ValidationException(["invalid input type for key '$key'"]);
           }
 
-          entity.runtime.setTransientValueForKey(this, key, decodedValue);
+          entity.runtime!.setTransientValueForKey(this, key, decodedValue);
         }
       } else {
         backing.setValueForProperty(
@@ -251,14 +251,14 @@ abstract class ManagedObject<T> extends Serializable {
 
     backing.contents.forEach((k, v) {
       if (!_isPropertyPrivate(k)) {
-        outputMap[k] = entity.properties[k].convertToPrimitiveValue(v);
+        outputMap[k] = entity.properties[k]!.convertToPrimitiveValue(v);
       }
     });
 
     entity.attributes.values
-        .where((attr) => attr.transientStatus?.isAvailableAsOutput ?? false)
+        .where((attr) => attr!.transientStatus?.isAvailableAsOutput ?? false)
         .forEach((attr) {
-      var value = entity.runtime.getTransientValueForKey(this, attr.name);
+      var value = entity.runtime!.getTransientValueForKey(this, attr!.name);
       if (value != null) {
         outputMap[attr.name] = value;
       }

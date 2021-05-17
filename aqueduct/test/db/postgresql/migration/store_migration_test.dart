@@ -124,7 +124,7 @@ class MCase11 extends Migration {
 
   @override
   Future seed() async {
-    await store.execute("INSERT INTO t VALUES (default)");
+    await store!.execute("INSERT INTO t VALUES (default)");
   }
 
   @override

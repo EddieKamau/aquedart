@@ -2,16 +2,17 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:http/http.dart' as http;
 import 'package:aqueduct/aqueduct.dart';
 import 'package:test/test.dart';
 
 void main() {
   group("Happy path", () {
-    Application app;
+    late Application app;
 
     tearDown(() async {
-      await app?.stop();
+      await app.stop();
     });
 
     test(
@@ -69,10 +70,10 @@ void main() {
   });
 
   group("Multiple listeners", () {
-    Application app;
+    late Application app;
 
     tearDown(() async {
-      await app?.stop();
+      await app.stop();
     });
 
     test("Message hub stream can have multiple listeners", () async {
@@ -108,10 +109,10 @@ void main() {
   });
 
   group("Failure cases", () {
-    Application app;
+    late Application app;
 
     tearDown(() async {
-      await app?.stop();
+      await app.stop();
     });
 
     test("Send invalid x-isolate data returns error in error stream", () async {
@@ -121,8 +122,8 @@ void main() {
       var resp = await postMessage("garbage");
       var errors = await getErrorsFromIsolates();
       var serverID = isolateIdentifierFromResponse(resp);
-      expect(errors[serverID].length, 1);
-      expect(errors[serverID].first,
+      expect(errors[serverID]!.length, 1);
+      expect(errors[serverID]!.first,
           contains("Illegal argument in isolate message"));
 
       // Make sure that we can still send messages from the isolate that encountered the error
@@ -145,26 +146,26 @@ void main() {
 }
 
 Future<http.Response> postMessage(String message) async {
-  return http.post("http://localhost:8000/send",
+  return http.post(Uri.parse("http://localhost:8000/send"),
       headers: {HttpHeaders.contentTypeHeader: ContentType.text.toString()},
       body: message);
 }
 
 Future waitForMessages(Map<int, List<Map<String, dynamic>>> expectedMessages,
-    {int butNeverReceiveIn}) async {
-  final response = await http.get("http://localhost:8000/messages");
+    {int? butNeverReceiveIn}) async {
+  final response = await http.get(Uri.parse("http://localhost:8000/messages"));
   final respondingIsolateID = isolateIdentifierFromResponse(response);
-  final messages = json.decode(response.body) as List<dynamic>;
+  final messages = json.decode(response.body) as List<dynamic>?;
 
   if (expectedMessages.containsKey(respondingIsolateID)) {
     final remainingMessagesExpectedForIsolateID =
         expectedMessages[respondingIsolateID];
-    for (var message in messages) {
+    for (var message in messages!) {
       final firstMatchedMessage =
-          remainingMessagesExpectedForIsolateID.firstWhere((msg) {
+          remainingMessagesExpectedForIsolateID!.firstWhereOrNull((msg) {
         return msg["isolateID"] == message["isolateID"] &&
             msg["message"] == message["message"];
-      }, orElse: () => null);
+      });
 
       if (firstMatchedMessage != null) {
         remainingMessagesExpectedForIsolateID.remove(firstMatchedMessage);
@@ -176,7 +177,7 @@ Future waitForMessages(Map<int, List<Map<String, dynamic>>> expectedMessages,
   }
 
   if (butNeverReceiveIn != null &&
-      messages.isNotEmpty &&
+      messages!.isNotEmpty &&
       respondingIsolateID == butNeverReceiveIn) {
     throw Exception("Received unexpected message from butNeverReceivedIn");
   }
@@ -193,7 +194,7 @@ Future<Map<int, List<Map<String, dynamic>>>> getMessagesFromIsolates() async {
   var msgs = <int, List<Map<String, dynamic>>>{};
 
   while (msgs.length != 3) {
-    var resp = await http.get("http://localhost:8000/messages");
+    var resp = await http.get(Uri.parse("http://localhost:8000/messages"));
     var serverID = isolateIdentifierFromResponse(resp);
 
     if (!msgs.containsKey(serverID)) {
@@ -208,7 +209,7 @@ Future<Map<int, List<String>>> getErrorsFromIsolates() async {
   var msgs = <int, List<String>>{};
 
   while (msgs.length != 3) {
-    var resp = await http.get("http://localhost:8000/errors");
+    var resp = await http.get(Uri.parse("http://localhost:8000/errors"));
     var serverID = isolateIdentifierFromResponse(resp);
 
     if (!msgs.containsKey(serverID)) {
@@ -220,7 +221,7 @@ Future<Map<int, List<String>>> getErrorsFromIsolates() async {
 }
 
 int isolateIdentifierFromResponse(http.Response response) {
-  return int.parse(response.headers["server"].split("/").last);
+  return int.parse(response.headers["server"]!.split("/").last);
 }
 
 class HubChannel extends ApplicationChannel {
@@ -235,7 +236,7 @@ class HubChannel extends ApplicationChannel {
       errors.add(err.toString());
     });
 
-    if (options.context["multipleListeners"] == true) {
+    if (options!.context["multipleListeners"] == true) {
       messageHub.listen((event) {
         messages.add(event as Map<String, dynamic>);
       }, onError: (err) {
@@ -243,7 +244,7 @@ class HubChannel extends ApplicationChannel {
       });
     }
 
-    if (options.context["sendIn"] == "prepare") {
+    if (options!.context["sendIn"] == "prepare") {
       messageHub.add({"isolateID": server.identifier, "message": "init"});
     }
   }

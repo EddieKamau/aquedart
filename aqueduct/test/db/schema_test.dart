@@ -175,7 +175,7 @@ void main() {
       expect(schema.tables.length, 4);
       expect(
           schema.tables.map((t) => t.name).toList()
-            ..sort((s1, s2) => s1.compareTo(s2)),
+            ..sort((s1, s2) => s1!.compareTo(s2!)),
           ["_Container", "_DefaultItem", "_LoadedItem", "_LoadedSingleItem"]);
 
       var containerTable =
@@ -415,7 +415,7 @@ void main() {
   });
 
   group("Matching", () {
-    Schema baseSchema;
+    late Schema baseSchema;
     setUp(() {
       var dataModel = ManagedDataModel(
           [LoadedSingleItem, DefaultItem, LoadedItem, Container, Unique]);
@@ -459,7 +459,7 @@ void main() {
 
     test("Table with different unique shows up as error", () {
       var newSchema = Schema.from(baseSchema);
-      newSchema.tableForName("_Unique").uniqueColumnSet = ["a", "b", "c"];
+      newSchema.tableForName("_Unique")!.uniqueColumnSet = ["a", "b", "c"];
       var diff = baseSchema.differenceFrom(newSchema);
       expect(diff.hasDifferences, true);
       expect(diff.errorMessages.length, 1);
@@ -467,7 +467,7 @@ void main() {
       expect(diff.errorMessages, contains(contains("'a', 'b', 'c'")));
 
       newSchema = Schema.from(baseSchema);
-      newSchema.tableForName("_Unique").uniqueColumnSet = ["a", "c"];
+      newSchema.tableForName("_Unique")!.uniqueColumnSet = ["a", "c"];
       diff = baseSchema.differenceFrom(newSchema);
       expect(diff.hasDifferences, true);
       expect(diff.errorMessages.length, 1);
@@ -476,10 +476,10 @@ void main() {
     });
 
     test("Table with same unique, but unordered, shows as equal", () {
-      expect(baseSchema.tableForName("_Unique").uniqueColumnSet, ["a", "b"]);
+      expect(baseSchema.tableForName("_Unique")!.uniqueColumnSet, ["a", "b"]);
 
       var newSchema = Schema.from(baseSchema);
-      newSchema.tableForName("_Unique").uniqueColumnSet = ["b", "a"];
+      newSchema.tableForName("_Unique")!.uniqueColumnSet = ["b", "a"];
 
       var diff = baseSchema.differenceFrom(newSchema);
       expect(diff.hasDifferences, false);
@@ -487,7 +487,7 @@ void main() {
 
     test("Table with no unique/unique show up as error", () {
       var newSchema = Schema.from(baseSchema);
-      newSchema.tableForName("_Unique").uniqueColumnSet = null;
+      newSchema.tableForName("_Unique")!.uniqueColumnSet = null;
       var diff = baseSchema.differenceFrom(newSchema);
       expect(diff.hasDifferences, true);
       expect(diff.errorMessages,
@@ -498,7 +498,7 @@ void main() {
               contains("Multi-column unique constraint on table '_Unique'")));
 
       var nextSchema = Schema.from(newSchema);
-      nextSchema.tableForName("_Unique").uniqueColumnSet = ["a", "b"];
+      nextSchema.tableForName("_Unique")!.uniqueColumnSet = ["a", "b"];
       diff = newSchema.differenceFrom(nextSchema);
       expect(diff.hasDifferences, true);
       expect(diff.errorMessages,
@@ -512,7 +512,7 @@ void main() {
     test("Missing column shows up as error", () {
       var newSchema = Schema.from(baseSchema);
       var t = newSchema.tables.firstWhere((t) => t.name == "_DefaultItem");
-      var c = t.columnForName("id");
+      var c = t.columnForName("id")!;
       t.removeColumn(c);
 
       var diff = baseSchema.differenceFrom(newSchema);
@@ -571,29 +571,29 @@ void main() {
         for here.
        */
 
-      column.isIndexed = !column.isIndexed;
+      column.isIndexed = !column.isIndexed!;
       var diff = baseSchema.differenceFrom(newSchema);
       expect(diff.hasDifferences, true);
       expect(diff.errorMessages.length, 1);
       expect(diff.errorMessages.first,
           'Column \'id\' in table \'_DefaultItem\' expected \'false\' for \'isIndexed\', but migration files yield \'true\'');
-      column.isIndexed = !column.isIndexed;
+      column.isIndexed = !column.isIndexed!;
 
-      column.isNullable = !column.isNullable;
+      column.isNullable = !column.isNullable!;
       diff = baseSchema.differenceFrom(newSchema);
       expect(diff.hasDifferences, true);
       expect(diff.errorMessages.length, 1);
       expect(diff.errorMessages.first,
           'Column \'id\' in table \'_DefaultItem\' expected \'false\' for \'isNullable\', but migration files yield \'true\'');
-      column.isNullable = !column.isNullable;
+      column.isNullable = !column.isNullable!;
 
-      column.isUnique = !column.isUnique;
+      column.isUnique = !column.isUnique!;
       diff = baseSchema.differenceFrom(newSchema);
       expect(diff.hasDifferences, true);
       expect(diff.errorMessages.length, 1);
       expect(diff.errorMessages.first,
           'Column \'id\' in table \'_DefaultItem\' expected \'false\' for \'isUnique\', but migration files yield \'true\'');
-      column.isUnique = !column.isUnique;
+      column.isUnique = !column.isUnique!;
 
       var captureValue = column.defaultValue;
       column.defaultValue = "foobar";
@@ -620,7 +620,7 @@ void main() {
       var df = newSchema.tables.firstWhere((t) => t.name == "_DefaultItem");
       df.addColumn(SchemaColumn("foobar", ManagedPropertyType.integer));
       newSchema
-          .tableForName("_LoadedItem")
+          .tableForName("_LoadedItem")!
           .columns
           .firstWhere((sc) => sc.name == "someIndexedThing")
           .isIndexed = false;
@@ -700,82 +700,82 @@ class Container extends ManagedObject<_Container> implements _Container {}
 
 class _Container {
   @primaryKey
-  int id;
+  int? id;
 
-  ManagedSet<DefaultItem> defaultItems;
-  ManagedSet<LoadedItem> loadedItems;
+  ManagedSet<DefaultItem>? defaultItems;
+  ManagedSet<LoadedItem>? loadedItems;
 }
 
 class DefaultItem extends ManagedObject<_DefaultItem> implements _DefaultItem {}
 
 class _DefaultItem {
   @primaryKey
-  int id;
+  int? id;
 
   @Relate(Symbol('defaultItems'))
-  Container container;
+  Container? container;
 }
 
 class LoadedItem extends ManagedObject<_LoadedItem> {}
 
 class _LoadedItem {
   @primaryKey
-  int id;
+  int? id;
 
   @Column(indexed: true)
-  String someIndexedThing;
+  String? someIndexedThing;
 
   @Relate(Symbol('loadedItems'),
       onDelete: DeleteRule.restrict, isRequired: false)
-  Container container;
+  Container? container;
 
-  LoadedSingleItem loadedSingleItem;
+  LoadedSingleItem? loadedSingleItem;
 }
 
 class LoadedSingleItem extends ManagedObject<_LoadedSingleItem> {}
 
 class _LoadedSingleItem {
   @primaryKey
-  int id;
+  int? id;
 
   @Relate(Symbol('loadedSingleItem'),
       onDelete: DeleteRule.cascade, isRequired: true)
-  LoadedItem loadedItem;
+  LoadedItem? loadedItem;
 }
 
 class SimpleModel extends ManagedObject<_SimpleModel> implements _SimpleModel {}
 
 class _SimpleModel {
   @primaryKey
-  int id;
+  int? id;
 }
 
 class ExtensiveModel extends ManagedObject<_ExtensiveModel>
     implements _ExtensiveModel {
   @Serialize()
-  String transientProperty;
+  String? transientProperty;
 }
 
 class _ExtensiveModel {
   @Column(primaryKey: true, databaseType: ManagedPropertyType.string)
-  String id;
+  String? id;
 
-  DateTime startDate;
+  DateTime? startDate;
 
   @Column(indexed: true)
-  int indexedValue;
+  int? indexedValue;
 
   @Column(autoincrement: true)
-  int autoincrementValue;
+  int? autoincrementValue;
 
   @Column(unique: true)
-  String uniqueValue;
+  String? uniqueValue;
 
   @Column(defaultValue: "'foo'")
-  String defaultItem;
+  String? defaultItem;
 
   @Column(nullable: true)
-  bool nullableValue;
+  bool? nullableValue;
 
   @Column(
       databaseType: ManagedPropertyType.bigInteger,
@@ -783,7 +783,7 @@ class _ExtensiveModel {
       defaultValue: "7",
       unique: true,
       indexed: true)
-  int loadedValue;
+  int? loadedValue;
 }
 
 class OverriddenModel extends ManagedObject<_OverriddenModel>
@@ -793,15 +793,15 @@ class _OverriddenModel extends PartialModel {
   @override
   @Column(indexed: true, unique: true)
   @Validate.oneOf(["a", "b"])
-  String field;
+  String? field;
 }
 
 class PartialModel {
   @primaryKey
-  int id;
+  int? id;
 
   @Column(indexed: true)
-  String field;
+  String? field;
 }
 
 class Unique extends ManagedObject<_Unique> implements _Unique {}
@@ -809,51 +809,51 @@ class Unique extends ManagedObject<_Unique> implements _Unique {}
 @Table.unique([Symbol('a'), Symbol('b')])
 class _Unique {
   @primaryKey
-  int id;
+  int? id;
 
-  String a;
-  String b;
-  String c;
+  String? a;
+  String? b;
+  String? c;
 }
 
 class SelfRef extends ManagedObject<_SelfRef> implements _SelfRef {}
 
 class _SelfRef {
   @primaryKey
-  int id;
+  int? id;
 
-  String name;
+  String? name;
 
-  ManagedSet<SelfRef> children;
+  ManagedSet<SelfRef>? children;
 
   @Relate(#children)
-  SelfRef parent;
+  SelfRef? parent;
 }
 
 class Left extends ManagedObject<_Left> implements _Left {}
 
 class _Left {
   @primaryKey
-  int id;
+  int? id;
 
-  String name;
+  String? name;
 
-  Right right;
+  Right? right;
 
   @Relate(#left)
-  Right belongsToRight;
+  Right? belongsToRight;
 }
 
 class Right extends ManagedObject<_Right> implements _Right {}
 
 class _Right {
   @primaryKey
-  int id;
+  int? id;
 
-  String name;
+  String? name;
 
-  Left left;
+  Left? left;
 
   @Relate(#right)
-  Left belongsToLeft;
+  Left? belongsToLeft;
 }

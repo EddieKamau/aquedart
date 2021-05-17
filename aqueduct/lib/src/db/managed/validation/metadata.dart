@@ -8,10 +8,10 @@ enum Validating { update, insert }
 /// Information about a validation being performed.
 class ValidationContext {
   /// Whether this validation is occurring during update or insert.
-  Validating event;
+  Validating? event;
 
   /// The property being validated.
-  ManagedPropertyDescription property;
+  ManagedPropertyDescription? property;
 
   /// State associated with the validator being run.
   ///
@@ -32,9 +32,9 @@ class ValidationContext {
   void addError(String reason) {
     final p = property;
     if (p is ManagedRelationshipDescription) {
-      errors.add("${p.entity.name}.${p.name}.${p.destinationEntity.primaryKey}: $reason");
+      errors.add("${p.entity!.name}.${p.name}.${p.destinationEntity!.primaryKey}: $reason");
     } else {
-      errors.add("${p.entity.name}.${p.name}: $reason");
+      errors.add("${p!.entity!.name}.${p.name}: $reason");
     }
   }
 
@@ -104,13 +104,13 @@ class Validate {
   const Validate._(
       {bool onUpdate = true,
       bool onInsert = true,
-      ValidateType validator,
+      ValidateType? validator,
       dynamic value,
-      Comparable greaterThan,
-      Comparable greaterThanEqualTo,
-      Comparable equalTo,
-      Comparable lessThan,
-      Comparable lessThanEqualTo})
+      Comparable? greaterThan,
+      Comparable? greaterThanEqualTo,
+      Comparable? equalTo,
+      Comparable? lessThan,
+      Comparable? lessThanEqualTo})
       : runOnUpdate = onUpdate,
         runOnInsert = onInsert,
         type = validator,
@@ -167,11 +167,11 @@ class Validate {
   /// If [onUpdate] is true (the default), this validation is run on update queries.
   /// If [onInsert] is true (the default), this validation is run on insert queries.
   const Validate.compare(
-      {Comparable lessThan,
-      Comparable greaterThan,
-      Comparable equalTo,
-      Comparable greaterThanEqualTo,
-      Comparable lessThanEqualTo,
+      {Comparable? lessThan,
+      Comparable? greaterThan,
+      Comparable? equalTo,
+      Comparable? greaterThanEqualTo,
+      Comparable? lessThanEqualTo,
       bool onUpdate = true,
       bool onInsert = true})
       : this._(
@@ -205,11 +205,11 @@ class Validate {
   /// If [onUpdate] is true (the default), this validation is run on update queries.
   /// If [onInsert] is true (the default), this validation is run on insert queries.
   const Validate.length(
-      {int lessThan,
-      int greaterThan,
-      int equalTo,
-      int greaterThanEqualTo,
-      int lessThanEqualTo,
+      {int? lessThan,
+      int? greaterThan,
+      int? equalTo,
+      int? greaterThanEqualTo,
+      int? lessThanEqualTo,
       bool onUpdate = true,
       bool onInsert = true})
       : this._(
@@ -289,12 +289,12 @@ class Validate {
   final bool runOnInsert;
 
   final dynamic _value;
-  final Comparable _greaterThan;
-  final Comparable _greaterThanEqualTo;
-  final Comparable _equalTo;
-  final Comparable _lessThan;
-  final Comparable _lessThanEqualTo;
-  final ValidateType type;
+  final Comparable? _greaterThan;
+  final Comparable? _greaterThanEqualTo;
+  final Comparable? _equalTo;
+  final Comparable? _lessThan;
+  final Comparable? _lessThanEqualTo;
+  final ValidateType? type;
 
   /// Subclasses override this method to perform any one-time initialization tasks and check for correctness.
   ///
@@ -310,8 +310,8 @@ class Validate {
   ///
   /// If compilation fails, throw a [ValidateCompilationError] with a message describing the issue. The entity
   /// and property will automatically be added to the error.
-  dynamic compile(ManagedType typeBeingValidated,
-      {Type relationshipInverseType}) {
+  dynamic compile(ManagedType? typeBeingValidated,
+      {Type? relationshipInverseType}) {
     switch (type) {
       case ValidateType.absent:
         return null;
@@ -319,7 +319,7 @@ class Validate {
         return null;
       case ValidateType.oneOf:
         {
-          return _oneOfCompiler(typeBeingValidated,
+          return _oneOfCompiler(typeBeingValidated!,
               relationshipInverseType: relationshipInverseType);
         }
       case ValidateType.comparison:
@@ -351,7 +351,7 @@ class Validate {
   ///
   /// The type of [input] will have already been type-checked prior to executing this method.
   void validate(ValidationContext context, dynamic input) {
-    switch (type) {
+    switch (type!) {
       case ValidateType.absent:
         {}
         break;
@@ -397,47 +397,47 @@ class Validate {
   /// to modify [object] for any constraints the validator imposes.
   void constrainSchemaObject(
       APIDocumentContext context, APISchemaObject object) {
-    switch (type) {
+    switch (type!) {
       case ValidateType.regex:
         {
-          object.pattern = _value as String;
+          object.pattern = _value as String?;
         }
         break;
       case ValidateType.comparison:
         {
           if (_greaterThan is num) {
             object.exclusiveMinimum = true;
-            object.minimum = _greaterThan as num;
+            object.minimum = _greaterThan as num?;
           } else if (_greaterThanEqualTo is num) {
             object.exclusiveMinimum = false;
-            object.minimum = _greaterThanEqualTo as num;
+            object.minimum = _greaterThanEqualTo as num?;
           }
 
           if (_lessThan is num) {
             object.exclusiveMaximum = true;
-            object.maximum = _lessThan as num;
+            object.maximum = _lessThan as num?;
           } else if (_lessThanEqualTo is num) {
             object.exclusiveMaximum = false;
-            object.maximum = _lessThanEqualTo as num;
+            object.maximum = _lessThanEqualTo as num?;
           }
         }
         break;
       case ValidateType.length:
         {
           if (_equalTo != null) {
-            object.maxLength = _equalTo as int;
-            object.minLength = _equalTo as int;
+            object.maxLength = _equalTo as int?;
+            object.minLength = _equalTo as int?;
           } else {
             if (_greaterThan is int) {
               object.minLength = 1 + (_greaterThan as int);
             } else if (_greaterThanEqualTo is int) {
-              object.minLength = _greaterThanEqualTo as int;
+              object.minLength = _greaterThanEqualTo as int?;
             }
 
             if (_lessThan is int) {
               object.maxLength = (-1) + (_lessThan as int);
             } else if (_lessThanEqualTo != null) {
-              object.maximum = _lessThanEqualTo as int;
+              object.maximum = _lessThanEqualTo as int?;
             }
           }
         }
@@ -450,14 +450,14 @@ class Validate {
         break;
       case ValidateType.oneOf:
         {
-          object.enumerated = _value as List<dynamic>;
+          object.enumerated = _value as List<dynamic>?;
         }
         break;
     }
   }
 
   dynamic _oneOfCompiler(ManagedType typeBeingValidated,
-      {Type relationshipInverseType}) {
+      {Type? relationshipInverseType}) {
     if (_value is! List) {
       throw ValidateCompilationError(
           "Validate.oneOf value must be a List<T>, where T is the type of the property being validated.");
@@ -514,8 +514,8 @@ class Validate {
     return comparisons;
   }
 
-  dynamic _comparisonCompiler(ManagedType typeBeingValidated,
-      {Type relationshipInverseType}) {
+  dynamic _comparisonCompiler(ManagedType? typeBeingValidated,
+      {Type? relationshipInverseType}) {
     final exprs = _expressions;
     exprs.forEach((expr) {
       expr.value = _parseComparisonValue(expr.value, typeBeingValidated,
@@ -524,9 +524,9 @@ class Validate {
     return exprs;
   }
 
-  Comparable _parseComparisonValue(
-      dynamic referenceValue, ManagedType typeBeingValidated,
-      {Type relationshipInverseType}) {
+  Comparable? _parseComparisonValue(
+      dynamic referenceValue, ManagedType? typeBeingValidated,
+      {Type? relationshipInverseType}) {
     if (typeBeingValidated?.kind == ManagedPropertyType.datetime) {
       if (referenceValue is String) {
         try {
@@ -542,22 +542,22 @@ class Validate {
     }
 
     if (relationshipInverseType == null) {
-      if (!typeBeingValidated.isAssignableWith(referenceValue)) {
+      if (!typeBeingValidated!.isAssignableWith(referenceValue)) {
         throw ValidateCompilationError(
             "Validate.compare value '$referenceValue' is not assignable to type of attribute being validated.");
       }
     } else {
-      if (!typeBeingValidated.isAssignableWith(referenceValue)) {
+      if (!typeBeingValidated!.isAssignableWith(referenceValue)) {
         throw ValidateCompilationError(
             "Validate.compare value '$referenceValue' is not assignable to primary key type of relationship being validated.");
       }
     }
 
-    return referenceValue as Comparable;
+    return referenceValue as Comparable?;
   }
 
-  dynamic _regexCompiler(ManagedType typeBeingValidated,
-      {Type relationshipInverseType}) {
+  dynamic _regexCompiler(ManagedType? typeBeingValidated,
+      {Type? relationshipInverseType}) {
     if (typeBeingValidated?.kind != ManagedPropertyType.string) {
       throw ValidateCompilationError(
           "Validate.matches is only valid for 'String' properties.");
@@ -571,8 +571,8 @@ class Validate {
     return RegExp(_value as String);
   }
 
-  dynamic _lengthCompiler(ManagedType typeBeingValidated,
-      {Type relationshipInverseType}) {
+  dynamic _lengthCompiler(ManagedType? typeBeingValidated,
+      {Type? relationshipInverseType}) {
     if (typeBeingValidated?.kind != ManagedPropertyType.string) {
       throw ValidateCompilationError(
           "Validate.length is only valid for 'String' properties.");

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:aqueduct/aqueduct.dart';
 import 'package:aqueduct/src/cli/migration_source.dart';
-import 'package:isolate_executor/isolate_executor.dart';
+import 'package:loner/loner.dart';
 
 class SchemaBuilderExecutable extends Executable<Map<String, dynamic>> {
   SchemaBuilderExecutable(Map<String, dynamic> message)
@@ -29,14 +29,14 @@ class SchemaBuilderExecutable extends Executable<Map<String, dynamic>> {
         .listen((r) => log("${r.message}"));
 
     try {
-      var outputSchema = inputSchema;
+      Schema? outputSchema = inputSchema;
       for (var source in sources) {
-        Migration instance = instanceOf(source.name);
+        Migration instance = instanceOf(source.name!);
         instance.database = SchemaBuilder(null, outputSchema);
         await instance.upgrade();
         outputSchema = instance.currentSchema;
       }
-      return outputSchema.asMap();
+      return outputSchema!.asMap();
     } on SchemaException catch (e) {
       return {
         "error":

@@ -37,12 +37,12 @@ class Table {
   /// Each instance of the associated table definition is unique for these properties.
   ///
   /// null if not set.
-  final List<Symbol> uniquePropertySet;
+  final List<Symbol>? uniquePropertySet;
 
   /// The name of the underlying database table.
   ///
   /// If this value is not set, the name defaults to the name of the table definition class.
-  final String name;
+  final String? name;
 }
 
 /// Possible values for a delete rule in a [Relate].
@@ -120,10 +120,10 @@ class Column {
   /// [defaultValue] is sent as-is to the database, therefore, if the default value is the integer value 2,
   /// pass the string "2". If the default value is a string, it must also be wrapped in single quotes: "'defaultValue'".
   const Column(
-      {bool primaryKey = false,
-      ManagedPropertyType databaseType,
+      {
+      required ManagedPropertyType databaseType,bool primaryKey = false,
       bool nullable = false,
-      String defaultValue,
+      String? defaultValue,
       bool unique = false,
       bool indexed = false,
       bool omitByDefault = false,
@@ -168,7 +168,7 @@ class Column {
   ///
   ///           ...
   ///         }
-  final String defaultValue;
+  final String? defaultValue;
 
   /// Whether or not the property is unique among all instances.
   ///

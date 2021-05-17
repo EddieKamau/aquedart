@@ -4,14 +4,14 @@ import 'dart:io';
 
 import 'package:path/path.dart' as path_lib;
 import 'package:pub_semver/pub_semver.dart';
-import 'package:command_line_agent/command_line_agent.dart';
+import 'package:cli_agent/cli_agent.dart';
 import 'package:test/test.dart';
 import 'package:yaml/yaml.dart';
 
 import '../not_tests/cli_helpers.dart';
 
 void main() {
-  CLIClient cli;
+  late CLIClient cli;
 
   setUpAll(() async {
     await CLIClient.activateCLI();

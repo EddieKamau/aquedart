@@ -1,8 +1,5 @@
-String sourcifyValue(dynamic v, {String onError}) {
+String sourcifyValue(dynamic v, {String? onError}) {
   if (v is String) {
-    if (v == null) {
-      return "null";
-    }
     if (!v.contains("'")) {
       return "'$v'";
     }
