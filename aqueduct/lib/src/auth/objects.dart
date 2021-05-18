@@ -218,7 +218,7 @@ class Authorization {
   /// this value would be the primary key of that user.
   ///
   /// If this authorization does not refer to a specific resource owner, this value will be null.
-  final dynamic ownerID;
+  final String? ownerID;
 
   /// The [AuthValidator] that granted this permission.
   final AuthValidator? validator;
