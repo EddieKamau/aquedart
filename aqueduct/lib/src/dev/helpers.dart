@@ -70,7 +70,7 @@ class TestToken implements AuthToken, AuthCode {
   @override
   String? type;
   @override
-  dynamic resourceOwnerIdentifier;
+  String? resourceOwnerIdentifier;
   @override
   String? clientID;
   @override

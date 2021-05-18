@@ -549,7 +549,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
   }
 
   AuthToken _generateToken(
-      dynamic ownerID, String? clientID, int expirationInSeconds,
+      String? ownerID, String? clientID, int expirationInSeconds,
       {bool allowRefresh = true, List<AuthScope>? scopes}) {
     final now = DateTime.now().toUtc();
     final token = AuthToken()
@@ -569,7 +569,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
   }
 
   AuthCode _generateAuthCode(
-      dynamic ownerID, AuthClient client, int expirationInSeconds,
+      String? ownerID, AuthClient client, int expirationInSeconds,
       {List<AuthScope>? scopes}) {
     final now = DateTime.now().toUtc();
     return AuthCode()
