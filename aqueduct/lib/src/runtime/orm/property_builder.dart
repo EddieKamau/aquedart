@@ -205,7 +205,7 @@ class PropertyBuilder {
     try {
       if (column?.databaseType != null) {
         return ManagedType(
-            declType.reflectedType, column!.databaseType, null, null);
+            declType.reflectedType, column!.databaseType!, null, null);
       }
 
       return getManagedTypeFromType(declType);
