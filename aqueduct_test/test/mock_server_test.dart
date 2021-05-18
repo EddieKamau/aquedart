@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 
 void main() {
   group("Mock HTTP Tests", () {
-    MockHTTPServer server;
+    late MockHTTPServer server;
     final testClient = Agent.onPort(4000);
 
     setUp(() async {
@@ -23,7 +23,7 @@ void main() {
     test("Request body is captured", () async {
       await testClient.put("/foo", body: {"a": "b"});
 
-      final serverRequest = await server.next();
+      final Request serverRequest = await server.next();
       expect(serverRequest.method, "PUT");
       expect(serverRequest.body.as<Map>()["a"], "b");
       // expectRequest(serverRequest, method: "PUT", body: {"a": "b"});
@@ -32,7 +32,7 @@ void main() {
     test("Request is enqueued and immediately available", () async {
       await testClient.get("/hello", query: {"foo": "bar"}, headers: {"X": "Y"});
 
-      final serverRequest = await server.next();
+      final Request serverRequest = await server.next();
       expect(serverRequest.method, "GET");
       expect(serverRequest.path.string, "/hello");
       expect(serverRequest.raw.uri.queryParameters["foo"], "bar");
@@ -45,10 +45,10 @@ void main() {
       final i1 = await Isolate.spawn(spawnFunc, ["/foo", 1], paused: true);
       final i2 = await Isolate.spawn(spawnFunc, ["/bar", 2], paused: true);
 
-      i1.resume(i1.pauseCapability);
-      i2.resume(i2.pauseCapability);
+      i1.resume(i1.pauseCapability!);
+      i2.resume(i2.pauseCapability!);
 
-      var serverRequest = await server.next();
+      Request serverRequest = await server.next();
       expect(serverRequest.path.string, "/foo");
       serverRequest = await server.next();
       expect(serverRequest.path.string, "/bar");
@@ -164,7 +164,7 @@ void main() {
 
       expect(
           outageResponseFuture.timeout(Duration(milliseconds: 100),
-              onTimeout: () {}),
+              onTimeout: () {} as FutureOr<TestResponse> Function()?),
           completes);
     });
 

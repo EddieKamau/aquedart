@@ -20,7 +20,7 @@ void main() {
     final authHeader = userClient.headers["authorization"];
     expect(authHeader, startsWith("Bearer"));
 
-    final q = Query<ManagedAuthToken>(harness.context)
+    final q = Query<ManagedAuthToken>(harness.context!)
       ..where((o) => o.accessToken).equalTo((authHeader as String).substring(7));
     final token = await q.fetchOne();
     expect(token.client.id, "id");
@@ -38,7 +38,7 @@ void main() {
     final authHeader = userClient.headers["authorization"];
     expect(authHeader, startsWith("Bearer"));
 
-    final q = Query<ManagedAuthToken>(harness.context)
+    final q = Query<ManagedAuthToken>(harness.context!)
       ..where((o) => o.accessToken).equalTo((authHeader as String).substring(7));
     final token = await q.fetchOne();
     expect(token.client.id, "confidential-id");
@@ -113,8 +113,8 @@ void main() {
 }
 
 class Channel extends ApplicationChannel {
-  ManagedContext context;
-  AuthServer authServer;
+  ManagedContext? context;
+  AuthServer? authServer;
 
   @override
   Future prepare() async {
@@ -122,7 +122,7 @@ class Channel extends ApplicationChannel {
         ManagedDataModel.fromCurrentMirrorSystem(),
         PostgreSQLPersistentStore(
             "dart", "dart", "localhost", 5432, "dart_test"));
-    authServer = AuthServer(ManagedAuthDelegate<User>(context));
+    authServer = AuthServer(ManagedAuthDelegate<User>(context!));
   }
 
   @override
@@ -130,7 +130,7 @@ class Channel extends ApplicationChannel {
     final router = Router();
     router
         .route("/endpoint")
-        .link(() => Authorizer.bearer(authServer, scopes: ["scope"]))
+        .link(() => Authorizer.bearer(authServer!, scopes: ["scope"]))
         .linkFunction((req) async => Response.ok({"key": "value"}));
     return router;
   }
@@ -142,10 +142,10 @@ class HarnessSubclass extends TestHarness<Channel>
   Future seed() async {}
 
   @override
-  AuthServer get authServer => channel.authServer;
+  AuthServer? get authServer => channel.authServer;
 
   @override
-  ManagedContext get context => channel.context;
+  ManagedContext? get context => channel.context;
 
 
   @override
@@ -160,7 +160,7 @@ class HarnessSubclass extends TestHarness<Channel>
       ..username = username
       ..salt = salt
       ..hashedPassword = AuthUtility.generatePasswordHash(password, salt);
-    return Query.insertObject(context, user);
+    return Query.insertObject(context!, user);
   }
 }
 

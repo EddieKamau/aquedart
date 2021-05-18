@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 
 void main() {
   group("Default harness", () {
-    TestHarness<Channel> harness;
+    late TestHarness<Channel> harness;
 
     setUp(() {
       harness = TestHarness<Channel>();
@@ -31,22 +31,22 @@ void main() {
         "Can start app in test mode and make a request to it with defaultClient",
         () async {
       await harness.start();
-      expectResponse(await harness.agent.request("endpoint").get(), 200,
+      expectResponse(await harness.agent!.request("endpoint").get(), 200,
           body: {"key": "value"});
-      expect(harness.application.isRunning, true);
+      expect(harness.application!.isRunning, true);
     });
 
     test("Can stop and restart an application", () async {
       await harness.start();
-      expectResponse(await harness.agent.request("endpoint").get(), 200,
+      expectResponse(await harness.agent!.request("endpoint").get(), 200,
           body: {"key": "value"});
-      expect(harness.application.isRunning, true);
+      expect(harness.application!.isRunning, true);
       await harness.stop();
       expect(harness.application, isNull);
       await harness.start();
-      expectResponse(await harness.agent.request("endpoint").get(), 200,
+      expectResponse(await harness.agent!.request("endpoint").get(), 200,
           body: {"key": "value"});
-      expect(harness.application.isRunning, true);
+      expect(harness.application!.isRunning, true);
     });
   });
 
@@ -94,13 +94,13 @@ class HarnessSubclass extends TestHarness<Channel> {
 
   @override
   Future beforeStart() async {
-    events.add(["beforeStart", application.isRunning]);
+    events.add(["beforeStart", application!.isRunning]);
   }
 
   @override
   Future afterStart() async {
     isAgentCreatedInAfterStart = agent != null;
-    events.add(["afterStart", application.isRunning]);
+    events.add(["afterStart", application!.isRunning]);
   }
 
   @override

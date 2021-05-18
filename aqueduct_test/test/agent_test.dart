@@ -8,7 +8,7 @@ import 'package:aqueduct_test/aqueduct_test.dart';
 
 void main() {
   group("Agent instantiation", () {
-    Application app;
+    Application? app;
 
     tearDown(() async {
       await app?.stop();
@@ -16,14 +16,14 @@ void main() {
 
     test("Create from app, explicit port", () async {
       app = Application<SomeChannel>()..options.port = 4111;
-      await app.startOnCurrentIsolate();
+      await app!.startOnCurrentIsolate();
       final client = Agent(app);
       expect(client.baseURL, "http://localhost:4111");
     });
 
     test("Create from app, assigned port", () async {
       app = Application<SomeChannel>()..options.port = 0;
-      await app.startOnCurrentIsolate();
+      await app!.startOnCurrentIsolate();
 
       final client = Agent(app);
       final response = await client.request("/").get();
@@ -44,7 +44,7 @@ void main() {
     test("Create from unstarted app, start app, works OK", () async {
       app = Application<SomeChannel>()..options.port = 0;
       final tc = Agent(app);
-      await app.startOnCurrentIsolate();
+      await app!.startOnCurrentIsolate();
 
       expectResponse(await tc.request("/").get(), 200);
     });
@@ -125,7 +125,7 @@ void main() {
       final defaultTestClient = Agent.onPort(4040);
       expect(await defaultTestClient.request("/foo").get() is TestResponse,
           true);
-      var msg = await server.next();
+      Request msg = await server.next();
       expect(msg.path.string, "/foo");
       expect(msg.method, "GET");
 
@@ -170,7 +170,7 @@ void main() {
 
       await defaultTestClient.get("/foo");
 
-      final msg = await server.next();
+      final Request msg = await server.next();
       expect(msg.path.string, "/foo");
       expect(msg.raw.headers.value("x-int"), "1");
       expect(msg.raw.headers.value("x-string"), "1");
@@ -187,7 +187,7 @@ void main() {
             })
           .get();
 
-      final msg = await server.next();
+      final Request msg = await server.next();
       expect(msg.path.string, "/foo");
       expect(msg.raw.headers.value("x-int"), "1, 2");
     });
@@ -213,7 +213,7 @@ void main() {
 
       await defaultTestClient.get("/foo", query: {"k": "v"});
 
-      final msg = await server.next();
+      final Request msg = await server.next();
       expect(msg.path.string, "/foo");
       expect(msg.raw.uri.query, "k=v");
     });
@@ -225,7 +225,7 @@ void main() {
 
       await defaultTestClient.get("/foo");
 
-      final msg = await server.next();
+      final Request msg = await server.next();
       expect(msg.path.string, "/foo");
       expect(msg.raw.headers.value("k"), "v");
       expect(msg.raw.headers.value("authorization"),
@@ -239,7 +239,7 @@ void main() {
 
       await defaultTestClient.get("/foo");
 
-      final msg = await server.next();
+      final Request msg = await server.next();
       expect(msg.path.string, "/foo");
       expect(msg.raw.headers.value("k"), "v");
       expect(msg.raw.headers.value("authorization"), "Bearer token");
@@ -247,7 +247,7 @@ void main() {
   });
 
   group("Response handling", () {
-    HttpServer server;
+    late HttpServer server;
 
     tearDown(() async {
       await server.close(force: true);

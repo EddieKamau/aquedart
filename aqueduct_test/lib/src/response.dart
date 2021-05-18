@@ -76,10 +76,10 @@ class TestResponseBody extends BodyDecoder {
   }
 
   final HttpClientResponse _response;
-  bool _hasContent;
+  late bool _hasContent;
 
   @override
-  ContentType get contentType => _response.headers.contentType;
+  ContentType get contentType => _response.headers.contentType!;
 
   @override
   bool get isEmpty => !_hasContent;

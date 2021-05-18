@@ -53,7 +53,7 @@ void main() {
     final DateTime xTimestamp = DateTime.parse("1984-08-04T00:00:00Z");
     final DateTime xDate = DateTime.parse("1981-08-04T00:00:00Z");
 
-    HttpServer server;
+    late HttpServer server;
     setUpAll(() async {
       server = await HttpServer.bind(InternetAddress.loopbackIPv4, 4000);
       server.listen((req) {
