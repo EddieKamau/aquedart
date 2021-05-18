@@ -100,9 +100,13 @@ abstract class CLICommand {
   T decode<T>(String key) {
     final val = _argumentValues[key];
     if (T == int && val is String) {
-      return int.parse(val) as T;
+      return int.tryParse(val) as T;
+    }else if(T == int && val == null){
+      return 1 as T;
+    }else{
+      return RuntimeContext.current.coerce(val);
     }
-    return RuntimeContext.current.coerce(val);
+    
   }
 
   void registerCommand(CLICommand cmd) {
