@@ -23,14 +23,13 @@ class Router extends Controller {
   Router({String? basePath, Future notFoundHandler(Request request)?})
       : _unmatchedController = notFoundHandler,
         _basePathSegments =
-            basePath?.split("/").where((str) => str.isNotEmpty).toList() ??
-                [] {
+            basePath?.split("/").where((str) => str.isNotEmpty).toList() ?? [] {
     policy!.allowCredentials = false;
   }
 
   final _RootNode _root = _RootNode();
   final List<_RouteController> _routeControllers = [];
-  final List<String> _basePathSegments;
+  final List<String>? _basePathSegments;
   final Function? _unmatchedController;
 
   /// A prefix for all routes on this instance.
@@ -41,14 +40,14 @@ class Router extends Controller {
   /// a request's path must be "/api/users" to match the route.
   ///
   /// Trailing and leading slashes have no impact on this value.
-  String get basePath => "/${_basePathSegments.join("/")}";
+  String get basePath => "/${_basePathSegments!.join("/")}";
 
   /// Adds a route that [Controller]s can be linked to.
   ///
   /// Routers allow for multiple linked controllers. A request that matches [pattern]
   /// will be sent to the controller linked to this method's return value.
   ///
-  /// The [pattern] must follow the rules of route patterns (see also http://aqueduct.io/docs/http/routing/).
+  /// The [pattern] must follow the rules of route patterns (see also http://aldrinsartfactory.github.io/liquidart/http/routing/).
   ///
   /// A pattern consists of one or more path segments, e.g. "/path" or "/path/to".
   ///
@@ -103,8 +102,8 @@ class Router extends Controller {
   }
 
   @override
-  Future? receive(Request req) async {
-    Controller? next;
+  Future receive(Request req) async {
+    Controller next;
     try {
       var requestURISegmentIterator = req.raw.uri.pathSegments.iterator;
 
@@ -112,22 +111,22 @@ class Router extends Controller {
         requestURISegmentIterator = [""].iterator;
       }
 
-      for (var i = 0; i < _basePathSegments.length; i++) {
+      for (var i = 0; i < _basePathSegments!.length; i++) {
         requestURISegmentIterator.moveNext();
-        if (_basePathSegments[i] != requestURISegmentIterator.current) {
+        if (_basePathSegments![i] != requestURISegmentIterator.current) {
           await _handleUnhandledRequest(req);
           return null;
         }
       }
 
       final node =
-          _root.node.nodeForPathSegments(requestURISegmentIterator, req.path);
-      if (node?.specification == null) {
+          _root.node!.nodeForPathSegments(requestURISegmentIterator, req.path);
+      if (node.specification == null) {
         await _handleUnhandledRequest(req);
         return null;
       }
-      req.path.setSpecification(node!.specification!,
-          segmentOffset: _basePathSegments.length);
+      req.path.setSpecification(node.specification!,
+          segmentOffset: _basePathSegments!.length);
 
       next = node.controller;
     } catch (any, stack) {
@@ -136,7 +135,7 @@ class Router extends Controller {
 
     // This line is intentionally outside of the try block
     // so that this object doesn't handle exceptions for 'next'.
-    return next?.receive(req);
+    return next.receive(req);
   }
 
   @override
@@ -182,7 +181,7 @@ class Router extends Controller {
 }
 
 class _RootNode {
-  late RouteNode node;
+  RouteNode? node;
 }
 
 class _RouteController extends Controller {
@@ -198,7 +197,7 @@ class _RouteController extends Controller {
   @override
   Map<String, APIPath> documentPaths(APIDocumentContext components) {
     return specifications.fold(<String, APIPath>{}, (pathMap, spec) {
-      final elements = spec.segments!.map((rs) {
+      final elements = spec.segments?.map((rs) {
         if (rs.isLiteralMatcher) {
           return rs.literal;
         } else if (rs.isVariable) {
