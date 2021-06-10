@@ -104,7 +104,7 @@ class UserController extends ResourceController {
 class AppConfiguration extends Configuration {
   AppConfiguration.fromFile(File file) : super.fromFile(file);
 
-  late DatabaseConfiguration database;
+  DatabaseConfiguration database  = DatabaseConfiguration();
 }
 
 class User extends ManagedObject<_User>

@@ -13,7 +13,7 @@ void main() {
     });
 
     tearDown(() async {
-      await harness?.stop();
+      await harness.stop();
     });
 
     test("options are used by application", () async {
@@ -21,10 +21,10 @@ void main() {
       await harness.start();
 
       // default value
-      expect(harness.channel.options.configurationFilePath, "config.src.yaml");
+      expect(harness.channel.options!.configurationFilePath, "config.src.yaml");
 
       // provided value
-      expect(harness.channel.options.context, {"key": "value"});
+      expect(harness.channel.options!.context, {"key": "value"});
     });
 
     test(

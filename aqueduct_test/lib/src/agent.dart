@@ -62,7 +62,7 @@ class Agent {
         _port = original._port,
         contentType = original.contentType,
         _application = original._application {
-    headers.addAll(original?.headers ?? {});
+    headers.addAll(original.headers );
   }
 
   final String? _scheme;
@@ -96,7 +96,7 @@ class Agent {
       if (!_application!.isRunning) {
         throw StateError("Application under test is not running.");
       }
-      return "${_application!.server.requiresHTTPS ? "https" : "http"}://localhost:${_application!.channel.server.server.port}";
+      return "${_application!.server!.requiresHTTPS ? "https" : "http"}://localhost:${_application!.channel!.server.server.port}";
     }
 
     return "$_scheme://$_host:$_port";
@@ -106,7 +106,7 @@ class Agent {
   ///
   /// Base-64 encodes username and password with a colon separator, and sets it
   /// for the key 'authorization' in [headers].
-  void setBasicAuthorization(String username, String password) {
+  void setBasicAuthorization(String username, String? password) {
     headers["authorization"] =
         "Basic ${base64.encode("$username:${password ?? ""}".codeUnits)}";
   }

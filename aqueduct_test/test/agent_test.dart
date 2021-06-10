@@ -72,7 +72,7 @@ void main() {
     });
 
     tearDown(() async {
-      await server?.close();
+      await server.close();
     });
 
     test("Host created correctly", () {
@@ -205,7 +205,7 @@ void main() {
       expect(
           resp, hasResponse(200, body: everyElement({"id": greaterThan(0)})));
 
-      await server?.close(force: true);
+      await server.close(force: true);
     });
 
     test("Query parameters are provided when using execute", () async {

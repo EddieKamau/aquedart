@@ -71,7 +71,7 @@ class TestResponseBody extends BodyDecoder {
   TestResponseBody(HttpClientResponse response)
       : _response = response,
         super(response) {
-    _hasContent = (response.headers.contentLength ?? 0) > 0 ||
+    _hasContent = (response.headers.contentLength) > 0 ||
         response.headers.chunkedTransferEncoding;
   }
 

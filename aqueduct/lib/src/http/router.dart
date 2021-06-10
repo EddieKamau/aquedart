@@ -119,13 +119,13 @@ class Router extends Controller {
         }
       }
 
-      final node =
-          _root.node!.nodeForPathSegments(requestURISegmentIterator, req.path);
-      if (node.specification == null) {
+      final node = // TODO
+          _root.node?.nodeForPathSegments(requestURISegmentIterator, req.path);
+      if (node?.specification == null) {
         await _handleUnhandledRequest(req);
         return null;
       }
-      req.path.setSpecification(node.specification!,
+      req.path.setSpecification(node!.specification!,
           segmentOffset: _basePathSegments!.length);
 
       next = node.controller;

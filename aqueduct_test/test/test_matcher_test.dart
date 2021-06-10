@@ -72,7 +72,7 @@ void main() {
     });
 
     tearDownAll(() async {
-      await server?.close(force: true);
+      await server.close(force: true);
     });
 
     test("Ensure existence of some headers", () async {
@@ -277,7 +277,7 @@ void main() {
     });
 
     tearDown(() async {
-      await server?.close();
+      await server.close();
     });
 
     test("Can match empty body", () async {
@@ -344,7 +344,7 @@ void main() {
     });
 
     tearDownAll(() async {
-      await server?.close();
+      await server.close();
     });
 
     test("List of terms", () async {
@@ -461,7 +461,7 @@ void main() {
     });
 
     tearDownAll(() async {
-      await server?.close();
+      await server.close();
     });
 
     test("Succeeds on fully specificed spec", () async {
