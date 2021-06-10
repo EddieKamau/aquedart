@@ -107,9 +107,9 @@ class Router extends Controller {
     try {
       var requestURISegmentIterator = req.raw.uri.pathSegments.iterator;
 
-      if (req.raw.uri.pathSegments.isEmpty) {
-        requestURISegmentIterator = [""].iterator;
-      }
+      // if (req.raw.uri.pathSegments.isEmpty) {
+      //   requestURISegmentIterator = [""].iterator;
+      // }
 
       for (var i = 0; i < _basePathSegments!.length; i++) {
         requestURISegmentIterator.moveNext();
@@ -119,7 +119,7 @@ class Router extends Controller {
         }
       }
 
-      final node = // TODO
+      final node = 
           _root.node?.nodeForPathSegments(requestURISegmentIterator, req.path);
       if (node?.specification == null) {
         await _handleUnhandledRequest(req);
