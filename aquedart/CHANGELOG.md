@@ -1,3 +1,8 @@
+## 5.0.0-b1
+
+- Migrated to null safety
+- Changed from Aqueduct to Aquedart
+
 ## 3.3.0-b1
 
 - Adds 'aquedart build' command that generates an executable binary of an aquedart app, with some known issues
