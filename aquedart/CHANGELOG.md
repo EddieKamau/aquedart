@@ -1,3 +1,7 @@
+## 5.0.1
+
+- fixed precomple issue
+
 ## 5.0.0-b1
 
 - Migrated to null safety
