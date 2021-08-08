@@ -92,7 +92,7 @@ class ResourceControllerParameter {
 
   // ignore: prefer_constructors_over_static_methods
   static ResourceControllerParameter make<T>(
-    {required String symbolName,
+      {required String symbolName,
       required String name,
       required BindingType location,
       required bool isRequired,
@@ -102,13 +102,19 @@ class ResourceControllerParameter {
       required List<String> ignoreFilter,
       required List<String> requireFilter,
       required List<String> rejectFilter}) {
-    return ResourceControllerParameter(symbolName: symbolName,
-      name: name, location: location, isRequired: isRequired,
-      decoder: decoder, type: T, defaultValue: defaultValue,
-      acceptFilter: acceptFilter, ignoreFilter: ignoreFilter,
-      requireFilter: requireFilter, rejectFilter: rejectFilter);
+    return ResourceControllerParameter(
+        symbolName: symbolName,
+        name: name,
+        location: location,
+        isRequired: isRequired,
+        decoder: decoder,
+        type: T,
+        defaultValue: defaultValue,
+        acceptFilter: acceptFilter,
+        ignoreFilter: ignoreFilter,
+        requireFilter: requireFilter,
+        rejectFilter: rejectFilter);
   }
-
 
   final String symbolName;
   final String? name;
@@ -139,7 +145,6 @@ class ResourceControllerParameter {
       default:
         throw StateError('unknown location');
     }
-    
   }
 
   String get locationName {
@@ -155,7 +160,6 @@ class ResourceControllerParameter {
       default:
         throw StateError('invalid location');
     }
-    
   }
 
   dynamic decode(Request? request) {
@@ -199,7 +203,6 @@ class ResourceControllerParameter {
       default:
         return _decoder!(request);
     }
-    
   }
 }
 

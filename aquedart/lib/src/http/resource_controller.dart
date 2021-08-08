@@ -233,7 +233,8 @@ abstract class ResourceController extends Controller
         null;
   }
 
-  List<String> _allowedMethodsForPathVariables(Iterable<String?> pathVariables) {
+  List<String> _allowedMethodsForPathVariables(
+      Iterable<String?> pathVariables) {
     return _runtime!.operations
         .where((op) => op.isSuitableForRequest(null, pathVariables.toList()))
         .map((op) => op.httpMethod)
@@ -295,13 +296,13 @@ abstract class ResourceController extends Controller
       }
       return null;
     };
-    final checkIfMissingRequiredAndEmitErrorIfSo = (ResourceControllerParameter p, dynamic v) {
+    final checkIfMissingRequiredAndEmitErrorIfSo =
+        (ResourceControllerParameter p, dynamic v) {
       if (v == null && p.isRequired) {
         if (p.location == BindingType.body) {
           errors.add("missing required ${p.locationName}");
         } else {
-          errors.add(
-            "missing required ${p.locationName} '${p.name ?? ""}'");
+          errors.add("missing required ${p.locationName} '${p.name ?? ""}'");
         }
         return null;
       }

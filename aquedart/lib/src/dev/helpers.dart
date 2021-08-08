@@ -96,7 +96,8 @@ class TestToken implements AuthToken, AuthCode {
     var map = {
       "access_token": accessToken,
       "token_type": type,
-      "expires_in": expirationDate!.difference(DateTime.now().toUtc()).inSeconds,
+      "expires_in":
+          expirationDate!.difference(DateTime.now().toUtc()).inSeconds,
     };
 
     if (refreshToken != null) {
@@ -182,7 +183,8 @@ class InMemoryAuthStorage extends AuthServerDelegate {
 
   @override
   void removeTokens(AuthServer server, dynamic resourceOwnerID) {
-    return tokens.removeWhere((t) => t.resourceOwnerIdentifier == resourceOwnerID);
+    return tokens
+        .removeWhere((t) => t.resourceOwnerIdentifier == resourceOwnerID);
   }
 
   @override
@@ -192,7 +194,8 @@ class InMemoryAuthStorage extends AuthServerDelegate {
     if (byAccessToken != null) {
       existing = tokens.firstWhereOrNull((t) => t.accessToken == byAccessToken);
     } else if (byRefreshToken != null) {
-      existing = tokens.firstWhereOrNull((t) => t.refreshToken == byRefreshToken);
+      existing =
+          tokens.firstWhereOrNull((t) => t.refreshToken == byRefreshToken);
     } else {
       throw ArgumentError(
           "byAccessToken and byRefreshToken are mutually exclusive");
@@ -206,8 +209,7 @@ class InMemoryAuthStorage extends AuthServerDelegate {
 
   @override
   FutureOr<TestUser>? getResourceOwner(AuthServer server, String username) {
-    return users.values
-        .firstWhereOrNull((t) => t.username == username);
+    return users.values.firstWhereOrNull((t) => t.username == username);
   }
 
   @override
@@ -215,10 +217,11 @@ class InMemoryAuthStorage extends AuthServerDelegate {
       tokens.removeWhere((t) => t.code == grantedByCode.code);
 
   @override
-  FutureOr addToken(AuthServer server, AuthToken token, {AuthCode? issuedFrom}) {
+  FutureOr addToken(AuthServer server, AuthToken token,
+      {AuthCode? issuedFrom}) {
     if (issuedFrom != null) {
-      var existingIssued = tokens.firstWhereOrNull(
-          (t) => t.code == issuedFrom.code);
+      var existingIssued =
+          tokens.firstWhereOrNull((t) => t.code == issuedFrom.code);
       var replacement = TestToken.from(token);
       replacement.code = issuedFrom.code;
       replacement.scopes = issuedFrom.requestedScopes;
@@ -239,7 +242,8 @@ class InMemoryAuthStorage extends AuthServerDelegate {
       String? newAccessToken,
       DateTime? newIssueDate,
       DateTime? newExpirationDate) {
-    var existing = tokens.firstWhereOrNull((e) => e.accessToken == oldAccessToken);
+    var existing =
+        tokens.firstWhereOrNull((e) => e.accessToken == oldAccessToken);
     if (existing != null) {
       var replacement = TestToken.from(existing)
         ..expirationDate = newExpirationDate
@@ -275,10 +279,12 @@ class InMemoryAuthStorage extends AuthServerDelegate {
       tokens.removeWhere((c) => c.code == code);
 
   @override
-  FutureOr<AuthClient>? getClient(AuthServer server, String? clientID) => clients[clientID];
+  FutureOr<AuthClient>? getClient(AuthServer server, String? clientID) =>
+      clients[clientID];
 
   @override
-  FutureOr removeClient(AuthServer server, String clientID) => clients.remove(clientID);
+  FutureOr removeClient(AuthServer server, String clientID) =>
+      clients.remove(clientID);
 
   @override
   List<AuthScope>? getAllowedScopes(ResourceOwner owner) => allowedScopes;
@@ -287,7 +293,8 @@ class InMemoryAuthStorage extends AuthServerDelegate {
 class DefaultPersistentStore extends PersistentStore {
   @override
   Query<T> newQuery<T extends ManagedObject>(
-      ManagedContext context, ManagedEntity? entity, {T? values}) {
+      ManagedContext context, ManagedEntity? entity,
+      {T? values}) {
     final q = _MockQuery<T>.withEntity(context, entity);
     if (values != null) {
       q.values = values;
@@ -301,8 +308,8 @@ class DefaultPersistentStore extends PersistentStore {
       null;
 
   @override
-  Future<dynamic> executeQuery(String formatString, Map<String?, dynamic> values,
-          int timeoutInSeconds,
+  Future<dynamic> executeQuery(String formatString,
+          Map<String?, dynamic> values, int timeoutInSeconds,
           {PersistentStoreQueryReturnType? returnType}) async =>
       null;
 

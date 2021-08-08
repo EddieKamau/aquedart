@@ -39,8 +39,9 @@ class ManagedAuthToken extends ManagedObject<_ManagedAuthToken>
 
   /// Instance from an [AuthToken].
   ManagedAuthToken.fromToken(AuthToken t) : super() {
-    final tokenResourceOwner =
-        entity.relationships!["resourceOwner"]!.destinationEntity!.instanceOf()!;
+    final tokenResourceOwner = entity
+        .relationships!["resourceOwner"]!.destinationEntity!
+        .instanceOf()!;
     tokenResourceOwner["id"] = t.resourceOwnerIdentifier;
     this
       ..accessToken = t.accessToken
@@ -55,8 +56,9 @@ class ManagedAuthToken extends ManagedObject<_ManagedAuthToken>
 
   /// Instance from an [AuthCode].
   ManagedAuthToken.fromCode(AuthCode code) : super() {
-    final tokenResourceOwner =
-        entity.relationships!["resourceOwner"]!.destinationEntity!.instanceOf()!;
+    final tokenResourceOwner = entity
+        .relationships!["resourceOwner"]!.destinationEntity!
+        .instanceOf()!;
     tokenResourceOwner["id"] = code.resourceOwnerIdentifier;
 
     this

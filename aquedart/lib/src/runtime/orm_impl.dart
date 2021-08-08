@@ -115,7 +115,8 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
                   MirrorSystem.getName(subclass.simpleName) ==
                   type.getDisplayString(withNullability: true)) ||
           type.getDisplayString(withNullability: true) == "Validate";
-      final isInstanceOfColumn = type.getDisplayString(withNullability: true) == "Column";
+      final isInstanceOfColumn =
+          type.getDisplayString(withNullability: true) == "Column";
 
       if (isSubclassOrInstanceOfValidate) {
         importUris.add(annotation.element!.source!.uri);
@@ -125,8 +126,7 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
             // ignore: deprecated_member_use
             element.session!.getParsedLibraryByElement(element.library);
         final elementDeclaration = originatingLibrary
-            .getElementDeclaration(
-                element.variable)!
+            .getElementDeclaration(element.variable)!
             .node as VariableDeclaration;
 
         return _getConstructorSourcesFromColumnArgList(

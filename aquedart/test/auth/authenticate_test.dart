@@ -14,9 +14,11 @@ void main() {
 
   test("isTokenExpired works correctly", () {
     var oldToken = AuthToken()
-      ..expirationDate = DateTime.now().toUtc().subtract(const Duration(seconds: 1));
+      ..expirationDate =
+          DateTime.now().toUtc().subtract(const Duration(seconds: 1));
     var futureToken = AuthToken()
-      ..expirationDate = DateTime.now().toUtc().add(const Duration(seconds: 10));
+      ..expirationDate =
+          DateTime.now().toUtc().add(const Duration(seconds: 10));
 
     expect(oldToken.isExpired, true);
     expect(futureToken.isExpired, false);
@@ -24,9 +26,11 @@ void main() {
 
   test("isAuthCodeExpired works correctly", () {
     var oldCode = AuthCode()
-      ..expirationDate = DateTime.now().toUtc().subtract(const Duration(seconds: 1));
+      ..expirationDate =
+          DateTime.now().toUtc().subtract(const Duration(seconds: 1));
     var futureCode = AuthCode()
-      ..expirationDate = DateTime.now().toUtc().add(const Duration(seconds: 10));
+      ..expirationDate =
+          DateTime.now().toUtc().add(const Duration(seconds: 10));
 
     expect(oldCode.isExpired, true);
     expect(futureCode.isExpired, false);
@@ -45,8 +49,7 @@ void main() {
     });
 
     test("Revoked client can no longer be accessed", () async {
-      expect(
-          await auth.getClient("com.stablekernel.app1") is AuthClient, true);
+      expect(await auth.getClient("com.stablekernel.app1") is AuthClient, true);
       await auth.removeClient("com.stablekernel.app1");
       expect(await auth.getClient("com.stablekernel.app1"), isNull);
     });
@@ -320,7 +323,8 @@ void main() {
       expect(token.refreshToken, isString);
       expect(token.clientID, "com.stablekernel.app1");
       expect(token.resourceOwnerIdentifier, createdUser!.id);
-      expect(token.issueDate!.difference(DateTime.now().toUtc()).inSeconds.abs(),
+      expect(
+          token.issueDate!.difference(DateTime.now().toUtc()).inSeconds.abs(),
           lessThan(5));
 
       final now = DateTime.now().toUtc();
@@ -463,8 +467,8 @@ void main() {
 
     test("Generate auth code with bad password fails", () async {
       try {
-        await auth.authenticateForCode(
-            createdUser!.username, "foobaraxegri%", "com.stablekernel.redirect");
+        await auth.authenticateForCode(createdUser!.username, "foobaraxegri%",
+            "com.stablekernel.redirect");
         expect(true, false);
       } on AuthServerException catch (e) {
         expect(e.client!.id, "com.stablekernel.redirect");

@@ -14,7 +14,8 @@ class PostgreSQLSchemaGenerator {
 
     var indexCommands = table.columns
         .where((col) =>
-            col.isIndexed! && !col.isPrimaryKey!) // primary keys are auto-indexed
+            col.isIndexed! &&
+            !col.isPrimaryKey!) // primary keys are auto-indexed
         .map((col) => addIndexToColumn(table, col))
         .expand((commands) => commands);
     commands.addAll(indexCommands);
@@ -168,7 +169,8 @@ class PostgreSQLSchemaGenerator {
     return "${tableName}_${_columnNameForColumn(column)}_fkey";
   }
 
-  List<String> _addConstraintsForColumn(String? tableName, SchemaColumn column) {
+  List<String> _addConstraintsForColumn(
+      String? tableName, SchemaColumn column) {
     return [
       "ALTER TABLE ONLY $tableName ADD FOREIGN KEY (${_columnNameForColumn(column)}) "
           "REFERENCES ${column.relatedTableName} (${column.relatedColumnName}) "

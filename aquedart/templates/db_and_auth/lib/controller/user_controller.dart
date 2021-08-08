@@ -16,7 +16,8 @@ class UserController extends ResourceController {
 
   @Operation.get("id")
   Future<Response> getUser(@Bind.path("id") int id) async {
-    final query = Query<User>(context!)..where((o) => o.id).equalTo(id.toString());
+    final query = Query<User>(context!)
+      ..where((o) => o.id).equalTo(id.toString());
     final u = await query.fetchOne();
     if (u == null) {
       return Response.notFound();
@@ -54,7 +55,8 @@ class UserController extends ResourceController {
       return Response.unauthorized();
     }
 
-    final query = Query<User>(context!)..where((o) => o.id).equalTo(id.toString());
+    final query = Query<User>(context!)
+      ..where((o) => o.id).equalTo(id.toString());
     await authServer!.revokeAllGrantsForResourceOwner(id);
     await query.delete();
 

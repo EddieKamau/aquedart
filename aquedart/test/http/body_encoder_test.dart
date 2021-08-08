@@ -127,14 +127,18 @@ void main() {
   });
 
   test("Encode with x-www-form-urlencoded", () {
-    final codec = CodecRegistry
-      .defaultInstance
-      .codecForContentType(ContentType("application", "x-www-form-urlencoded"))!;
+    final codec = CodecRegistry.defaultInstance.codecForContentType(
+        ContentType("application", "x-www-form-urlencoded"))!;
 
     expect(codec.encode(<String, dynamic>{"k": "v"}), "k=v".codeUnits);
     expect(codec.encode(<String, dynamic>{"k": "v!v"}), "k=v%21v".codeUnits);
-    expect(codec.encode(<String, dynamic>{"k1": "v1", "k2": "v2"}), "k1=v1&k2=v2".codeUnits);
-    expect(codec.encode(<String, dynamic>{"k": ["v1", "v!"]}), "k=v1&k=v%21".codeUnits);
+    expect(codec.encode(<String, dynamic>{"k1": "v1", "k2": "v2"}),
+        "k1=v1&k2=v2".codeUnits);
+    expect(
+        codec.encode(<String, dynamic>{
+          "k": ["v1", "v!"]
+        }),
+        "k=v1&k=v%21".codeUnits);
   });
 
   group("Compression", () {
@@ -270,7 +274,8 @@ class ByteCodec extends Codec<dynamic, List<int>?> {
   @override
   Converter<dynamic, List<int>> get encoder => const ByteEncoder();
   @override
-  Converter<List<int>, dynamic> get decoder => null  as Converter<List<int>, String>;
+  Converter<List<int>, dynamic> get decoder =>
+      null as Converter<List<int>, String>;
 }
 
 class ByteEncoder extends Converter<String, List<int>> {
@@ -296,7 +301,7 @@ class BadDataCodec extends Codec {
   @override
   Converter get encoder => const BadDataEncoder();
   @override
-  Converter get decoder => null  as Converter<List<int>, String>;
+  Converter get decoder => null as Converter<List<int>, String>;
 }
 
 class BadDataEncoder extends Converter<String, String> {

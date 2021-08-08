@@ -24,7 +24,8 @@ class AuthUtility {
   static String generatePasswordHash(String password, String? salt,
       {int hashRounds = 1000, int hashLength = 32, Hash? hashFunction}) {
     final generator = PBKDF2(hashAlgorithm: hashFunction ?? sha256);
-    return generator.generateBase64Key(password, salt ?? '', hashRounds, hashLength);
+    return generator.generateBase64Key(
+        password, salt ?? '', hashRounds, hashLength);
   }
 
   /// A utility method to generate a random base64 salt.

@@ -83,15 +83,16 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
   @override
   APIRequestBody? documentOperationRequestBody(
       ResourceController rc, APIDocumentContext context, Operation? operation) {
-    final op =
-        runtime.getOperationRuntime(operation!.method, operation.pathVariables)!;
+    final op = runtime.getOperationRuntime(
+        operation!.method, operation.pathVariables)!;
     final usesFormEncodedData = operation.method == "POST" &&
         rc.acceptedContentTypes.any((ct) =>
             ct.primaryType == "application" &&
             ct.subType == "x-www-form-urlencoded");
-    final boundBody = op.positionalParameters.firstWhereOrNull(
-            (p) => p.location == BindingType.body) ??
-        op.namedParameters.firstWhereOrNull((p) => p.location == BindingType.body);
+    final boundBody = op.positionalParameters
+            .firstWhereOrNull((p) => p.location == BindingType.body) ??
+        op.namedParameters
+            .firstWhereOrNull((p) => p.location == BindingType.body);
 
     if (boundBody != null) {
       final ref = getSchemaObjectReference(context, boundBody.type);
@@ -111,8 +112,10 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
         return prev;
       });
 
-      return APIRequestBody.schema(APISchemaObject.object(props as Map<String, APISchemaObject>?),
-          contentTypes: ["application/x-www-form-urlencoded"], required: true);
+      return APIRequestBody.schema(
+          APISchemaObject.object(props as Map<String, APISchemaObject>?),
+          contentTypes: ["application/x-www-form-urlencoded"],
+          required: true);
     }
 
     return null;
@@ -121,8 +124,8 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
   @override
   Map<String, APIOperation> documentOperations(ResourceController rc,
       APIDocumentContext context, String route, APIPath path) {
-    final opsForPath = runtime.operations
-        .where((method) => path.containsPathParameters(method.pathVariables as List<String>));
+    final opsForPath = runtime.operations.where((method) =>
+        path.containsPathParameters(method.pathVariables as List<String>));
 
     return opsForPath.fold(<String, APIOperation>{}, (prev, opObj) {
       final instanceMembers = reflect(rc).type.instanceMembers;
@@ -133,7 +136,8 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
           rc.documentOperationResponses(context, metadata),
           summary: rc.documentOperationSummary(context, metadata),
           description: rc.documentOperationDescription(context, metadata),
-          parameters: rc.documentOperationParameters(context, metadata) as List<APIParameter>?,
+          parameters: rc.documentOperationParameters(context, metadata)
+              as List<APIParameter>?,
           requestBody: rc.documentOperationRequestBody(context, metadata),
           tags: rc.documentOperationTags(context, metadata));
 
@@ -141,7 +145,8 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
         context.defer(() async {
           operationDoc.security?.forEach((sec) {
             sec.requirements!.forEach((name, operationScopes) {
-              final secType = context.document.components!.securitySchemes[name];
+              final secType =
+                  context.document.components!.securitySchemes[name];
               if (secType?.type == APISecuritySchemeType.oauth2 ||
                   secType?.type == APISecuritySchemeType.openID) {
                 _mergeScopes(operationScopes, opObj.scopes!);

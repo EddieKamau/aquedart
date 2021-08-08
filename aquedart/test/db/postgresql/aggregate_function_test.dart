@@ -51,19 +51,22 @@ void main() {
     test("Average produces average for int type", () async {
       var q = Query<Test>(ctx);
       var result = await q.reduce.average((t) => t.i);
-      expect(result, objects.fold(0, (dynamic p, n) => p + n.i) / objects.length);
+      expect(
+          result, objects.fold(0, (dynamic p, n) => p + n.i) / objects.length);
     });
 
     test("Average produces average for double type", () async {
       var q = Query<Test>(ctx);
       var result = await q.reduce.average((t) => t.d);
-      expect(result, objects.fold(0, (dynamic p, n) => p + n.d) / objects.length);
+      expect(
+          result, objects.fold(0, (dynamic p, n) => p + n.d) / objects.length);
     });
 
     test("Average with predicate", () async {
       var q = Query<Test>(ctx)..where((p) => p.id).lessThanEqualTo(5);
       var result = await q.reduce.average((t) => t.i);
-      expect(result, objects.sublist(0, 5).fold(0, (dynamic p, n) => p + n.i) / 5);
+      expect(
+          result, objects.sublist(0, 5).fold(0, (dynamic p, n) => p + n.i) / 5);
     });
   });
 

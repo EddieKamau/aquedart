@@ -119,7 +119,7 @@ class Router extends Controller {
         }
       }
 
-      final node = 
+      final node =
           _root.node?.nodeForPathSegments(requestURISegmentIterator, req.path);
       if (node?.specification == null) {
         await _handleUnhandledRequest(req);

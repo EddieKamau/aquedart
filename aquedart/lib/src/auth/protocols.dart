@@ -111,8 +111,12 @@ abstract class AuthServerDelegate {
   ///
   /// You may alter the token in addition to the provided values, and you may override the provided values.
   /// [newAccessToken] defaults to a random 32 character string.
-  FutureOr updateToken(AuthServer server, String? oldAccessToken,
-      String? newAccessToken, DateTime? newIssueDate, DateTime? newExpirationDate);
+  FutureOr updateToken(
+      AuthServer server,
+      String? oldAccessToken,
+      String? newAccessToken,
+      DateTime? newIssueDate,
+      DateTime? newExpirationDate);
 
   /// Must store [code].
   ///

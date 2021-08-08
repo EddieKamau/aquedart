@@ -79,8 +79,8 @@ void main() {
 
     test("Authorizer adds Forbidden and Unauthorized to response components",
         () {
-      expect(
-          doc.components!.responses["InsufficientScope"]!.description, isNotNull);
+      expect(doc.components!.responses["InsufficientScope"]!.description,
+          isNotNull);
       expect(
           doc.components!.responses["InsufficientScope"]!
               .content!["application/json"]!.schema!.type,
@@ -98,7 +98,8 @@ void main() {
           isNotNull);
 
       expect(
-          doc.components!.responses["MalformedAuthorizationHeader"]!.description,
+          doc.components!.responses["MalformedAuthorizationHeader"]!
+              .description,
           isNotNull);
     });
 
@@ -142,16 +143,19 @@ void main() {
       final doc = await Application.document(AuthControllerOnlyChannel,
           ApplicationOptions(), {"name": "Test", "version": "1.0"});
       expect(
-          doc.components!.securitySchemes["oauth2"]!.flows!["password"]!.refreshURL,
+          doc.components!.securitySchemes["oauth2"]!.flows!["password"]!
+              .refreshURL,
           Uri(path: "auth/token"));
       expect(
-          doc.components!.securitySchemes["oauth2"]!.flows!["password"]!.tokenURL,
+          doc.components!.securitySchemes["oauth2"]!.flows!["password"]!
+              .tokenURL,
           Uri(path: "auth/token"));
       expect(
           doc.components!.securitySchemes["oauth2"]!.flows!["password"]!
               .authorizationURL,
           isNull);
-      expect(doc.components!.securitySchemes["oauth2"]!.flows!["password"]!.scopes,
+      expect(
+          doc.components!.securitySchemes["oauth2"]!.flows!["password"]!.scopes,
           {});
     });
 
@@ -161,10 +165,12 @@ void main() {
       final doc = await Application.document(ScopedControllerChannel,
           ApplicationOptions(), {"name": "Test", "version": "1.0"});
       expect(
-          doc.components!.securitySchemes["oauth2"]!.flows!["password"]!.refreshURL,
+          doc.components!.securitySchemes["oauth2"]!.flows!["password"]!
+              .refreshURL,
           Uri(path: "auth/token"));
       expect(
-          doc.components!.securitySchemes["oauth2"]!.flows!["password"]!.tokenURL,
+          doc.components!.securitySchemes["oauth2"]!.flows!["password"]!
+              .tokenURL,
           Uri(path: "auth/token"));
       expect(
           doc.components!.securitySchemes["oauth2"]!.flows!["password"]!
@@ -172,16 +178,16 @@ void main() {
           isNull);
 
       expect(
-          doc.components!.securitySchemes["oauth2"]!.flows!["authorizationCode"]!
-              .refreshURL,
+          doc.components!.securitySchemes["oauth2"]!
+              .flows!["authorizationCode"]!.refreshURL,
           Uri(path: "auth/token"));
       expect(
-          doc.components!.securitySchemes["oauth2"]!.flows!["authorizationCode"]!
-              .tokenURL,
+          doc.components!.securitySchemes["oauth2"]!
+              .flows!["authorizationCode"]!.tokenURL,
           Uri(path: "auth/token"));
       expect(
-          doc.components!.securitySchemes["oauth2"]!.flows!["authorizationCode"]!
-              .authorizationURL,
+          doc.components!.securitySchemes["oauth2"]!
+              .flows!["authorizationCode"]!.authorizationURL,
           Uri(path: "auth/code"));
     });
 
@@ -190,11 +196,12 @@ void main() {
         () async {
       final doc = await Application.document(ScopedControllerChannel,
           ApplicationOptions(), {"name": "Test", "version": "1.0"});
-      expect(doc.components!.securitySchemes["oauth2"]!.flows!["password"]!.scopes,
+      expect(
+          doc.components!.securitySchemes["oauth2"]!.flows!["password"]!.scopes,
           {"scope1": "", "scope2": ""});
       expect(
-          doc.components!.securitySchemes["oauth2"]!.flows!["authorizationCode"]!
-              .scopes,
+          doc.components!.securitySchemes["oauth2"]!
+              .flows!["authorizationCode"]!.scopes,
           {"scope1": "", "scope2": ""});
     });
   });
@@ -312,7 +319,8 @@ class ScopedControllerChannel extends ApplicationChannel {
         .link(() => DocumentedController());
     router
         .route("/r2")
-        .link(() => Authorizer.bearer(authServer, scopes: ["scope1", "scope2"]))!
+        .link(
+            () => Authorizer.bearer(authServer, scopes: ["scope1", "scope2"]))!
         .link(() => DocumentedController());
 
     router

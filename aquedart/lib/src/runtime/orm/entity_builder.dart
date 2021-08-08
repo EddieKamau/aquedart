@@ -27,8 +27,8 @@ class EntityBuilder {
     runtime = ManagedEntityRuntimeImpl(instanceType, entity);
 
     properties = _getProperties();
-    primaryKeyProperty = properties
-        .firstWhereOrNull((p) => p.column?.isPrimaryKey ?? false);
+    primaryKeyProperty =
+        properties.firstWhereOrNull((p) => p.column?.isPrimaryKey ?? false);
     if (primaryKeyProperty == null) {
       throw ManagedDataModelErrorImpl.noPrimaryKey(entity);
     }
@@ -87,7 +87,7 @@ class EntityBuilder {
         final prop = properties.firstWhere((p) => p.name == key, orElse: () {
           throw ManagedDataModelErrorImpl.invalidEntityUniqueProperty(
               tableDefinitionTypeName, Symbol(key));
-        } );
+        });
 
         if (prop.isRelationship &&
             prop.relationshipType != ManagedRelationshipType.belongsTo) {
@@ -138,7 +138,8 @@ class EntityBuilder {
     entity!.relationships = relationships;
     entity!.validators = [];
     entity!.validators.addAll(attributes.values.expand((a) => a!.validators));
-    entity!.validators.addAll(relationships.values.expand((a) => a!.validators));
+    entity!.validators
+        .addAll(relationships.values.expand((a) => a!.validators));
     entity!.uniquePropertySet =
         uniquePropertySet?.map((key) => entity!.properties[key]).toList();
   }
@@ -221,8 +222,7 @@ class EntityBuilder {
 
     final out = <PropertyBuilder>[];
     attributes.forEach((prop) {
-      final complement =
-          out.firstWhereOrNull((pb) => pb.name == prop.name);
+      final complement = out.firstWhereOrNull((pb) => pb.name == prop.name);
       if (complement != null) {
         complement.serialize = const Serialize(input: true, output: true);
       } else {

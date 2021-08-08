@@ -120,8 +120,8 @@ class Column {
   /// [defaultValue] is sent as-is to the database, therefore, if the default value is the integer value 2,
   /// pass the string "2". If the default value is a string, it must also be wrapped in single quotes: "'defaultValue'".
   const Column(
-      {
-      ManagedPropertyType? databaseType,bool primaryKey = false,
+      {ManagedPropertyType? databaseType,
+      bool primaryKey = false,
       bool nullable = false,
       String? defaultValue,
       bool unique = false,
@@ -138,7 +138,6 @@ class Column {
         shouldOmitByDefault = omitByDefault,
         autoincrement = autoincrement,
         validators = validators;
-
 
   /// When true, indicates that this property is the primary key.
   ///
@@ -237,7 +236,7 @@ class Serialize {
 ///
 /// The validator [Validate.constant] is automatically applied to a property with this annotation.
 const Column primaryKey = Column(
-  primaryKey: true,
-  databaseType: ManagedPropertyType.bigInteger,
-  autoincrement: true,
-  validators: [Validate.constant()]);
+    primaryKey: true,
+    databaseType: ManagedPropertyType.bigInteger,
+    autoincrement: true,
+    validators: [Validate.constant()]);

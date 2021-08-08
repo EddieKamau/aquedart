@@ -165,27 +165,30 @@ void main() {
       expect(results.first.children!.first.backing.contents.containsKey("toy"),
           false);
       expect(
-          results.first.children!.first.backing.contents.containsKey("vaccinations"),
+          results.first.children!.first.backing.contents
+              .containsKey("vaccinations"),
           false);
       expect(results.first.children!.last.name, "C2");
       expect(results.first.children!.last.backing.contents.containsKey("toy"),
           false);
       expect(
-          results.first.children!.last.backing.contents.containsKey("vaccinations"),
+          results.first.children!.last.backing.contents
+              .containsKey("vaccinations"),
           false);
 
       expect(results[1].pid, isNotNull);
       expect(results[1].name, "C");
       expect(results[1].children!.length, 1);
       expect(results[1].children!.first.name, "C5");
-      expect(
-          results[1].children!.first.backing.contents.containsKey("toy"), false);
+      expect(results[1].children!.first.backing.contents.containsKey("toy"),
+          false);
       expect(
           results[1]
               .children!
               .first
               .backing
-              .contents.containsKey("vaccinations"),
+              .contents
+              .containsKey("vaccinations"),
           false);
 
       expect(results.last.pid, isNotNull);

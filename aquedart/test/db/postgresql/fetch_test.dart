@@ -283,7 +283,8 @@ void main() {
 
   test("Fetch object with null reference", () async {
     context = await contextWithModels([GenUser, GenPost]);
-    GenPost? p1 = await (Query<GenPost>(context!)..values = (GenPost()..text = "1"))
+    GenPost? p1 = await (Query<GenPost>(context!)
+          ..values = (GenPost()..text = "1"))
         .insert();
 
     var req = Query<GenPost>(context!);

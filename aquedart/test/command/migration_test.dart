@@ -46,7 +46,8 @@ void main() {
 
       var mig = Migration1();
       mig.version = 1;
-      final outSchema = await (store.upgrade(schema, [mig], temporary: true) as FutureOr<Schema>);
+      final outSchema = await (store.upgrade(schema, [mig], temporary: true)
+          as FutureOr<Schema>);
 
       // 'Sync up' that schema to compare it
       final tableToKeep = schema.tableForName("tableToKeep")!;
@@ -54,9 +55,7 @@ void main() {
           "addedColumn", ManagedPropertyType.integer,
           defaultValue: "2"));
       tableToKeep.removeColumn(tableToKeep.columnForName("columnToDelete")!);
-      tableToKeep
-          .columnForName("columnToEdit")!
-          .defaultValue = "'foo'";
+      tableToKeep.columnForName("columnToEdit")!.defaultValue = "'foo'";
 
       schema.removeTable(schema.tableForName("tableToDelete")!);
 

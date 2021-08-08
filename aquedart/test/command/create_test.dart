@@ -105,8 +105,7 @@ void main() {
       var res = await cli.run("create", ["test_project", "--offline"]);
       expect(res, 0);
 
-      var aquedartLocationString = File.fromUri(cli
-              .agent.workingDirectory.uri
+      var aquedartLocationString = File.fromUri(cli.agent.workingDirectory.uri
               .resolve("test_project/")
               .resolve(".packages"))
           .readAsStringSync()
@@ -141,7 +140,8 @@ void main() {
 
       test("Tests run on template generated from local path", () async {
         expect(
-            await cli.run("create", ["test_project", "-t", template, "--offline"]),
+            await cli
+                .run("create", ["test_project", "-t", template, "--offline"]),
             0);
 
         final cmd = Platform.isWindows ? "pub.bat" : "pub";

@@ -127,13 +127,14 @@ abstract class ManagedPropertyDescription {
         return APISchemaObject.array(
             ofSchema: _typedSchemaObject(type.elements!));
       case ManagedPropertyType.map:
-        return APISchemaObject.map(ofSchema: _typedSchemaObject(type.elements!));
+        return APISchemaObject.map(
+            ofSchema: _typedSchemaObject(type.elements!));
       case ManagedPropertyType.document:
         return APISchemaObject.freeForm();
       default:
-        throw UnsupportedError("Unsupported type '$type' when documenting entity.");
+        throw UnsupportedError(
+            "Unsupported type '$type' when documenting entity.");
     }
-
   }
 }
 
@@ -328,7 +329,8 @@ class ManagedAttributeDescription extends ManagedPropertyDescription {
     } else if (isEnumeratedValue) {
       // todo: optimize?
       return value.toString().split(".").last;
-    } else if (type!.kind == ManagedPropertyType.document && value is Document) {
+    } else if (type!.kind == ManagedPropertyType.document &&
+        value is Document) {
       return value.data;
     }
 
@@ -482,8 +484,7 @@ class ManagedRelationshipDescription extends ManagedPropertyDescription {
         throw ValidationException(["invalid input type for '$name'"]);
       }
 
-      final instance = destinationEntity!.instanceOf()
-        ?..readFromMap(value);
+      final instance = destinationEntity!.instanceOf()?..readFromMap(value);
 
       return instance;
     }
@@ -498,8 +499,7 @@ class ManagedRelationshipDescription extends ManagedPropertyDescription {
       if (m is! Map<String, dynamic>) {
         throw ValidationException(["invalid input type for '$name'"]);
       }
-      final instance = destinationEntity!.instanceOf()
-        ?..readFromMap(m);
+      final instance = destinationEntity!.instanceOf()?..readFromMap(m);
       return instance;
     };
     return destinationEntity!.setOf(value.map(instantiator));

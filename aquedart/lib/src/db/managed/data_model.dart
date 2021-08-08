@@ -30,7 +30,8 @@ class ManagedDataModel extends Object
         .whereType<ManagedEntityRuntime>()
         .toList();
     final expectedRuntimes = instanceTypes
-        .map((t) => runtimes.firstWhereOrNull((e) => e.entity!.instanceType == t))
+        .map((t) =>
+            runtimes.firstWhereOrNull((e) => e.entity!.instanceType == t))
         .toList();
 
     final notFound = expectedRuntimes.where((e) => e == null).toList();

@@ -9,8 +9,8 @@ class DataModelCompiler {
     final m = <String, dynamic>{};
 
     final instanceTypes = context.types
-      .where(_isTypeManagedObjectSubclass)
-      .map((c) => c.reflectedType);
+        .where(_isTypeManagedObjectSubclass)
+        .map((c) => c.reflectedType);
 
     _builders = instanceTypes.map((t) => EntityBuilder(t)).toList();
     _builders!.forEach((b) {
@@ -255,11 +255,8 @@ class ManagedDataModelErrorImpl extends ManagedDataModelError {
   }
 
   static String _getInstanceClassName(ManagedEntity entity) {
-
-
     return _getName(reflectType(entity.instanceType).simpleName);
   }
 
-  static String _getName(Symbol s) =>
-       MirrorSystem.getName(s);
+  static String _getName(Symbol s) => MirrorSystem.getName(s);
 }

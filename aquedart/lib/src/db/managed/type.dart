@@ -98,8 +98,6 @@ class ManagedType {
       default:
         return false;
     }
-
-    
   }
 
   @override

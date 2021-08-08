@@ -150,7 +150,8 @@ void main() {
 
     test("Finalize throws error if contains unresolved uri reference",
         () async {
-      ctx.document.components!.responses["test"] = APIResponse("desc", content: {
+      ctx.document.components!.responses["test"] =
+          APIResponse("desc", content: {
         "application/json": APIMediaType(schema: ctx.schema.getObject("foo"))
       });
 
@@ -174,7 +175,8 @@ void main() {
         })
       };
 
-      ctx.document.components!.responses["test"] = APIResponse("desc", content: {
+      ctx.document.components!.responses["test"] =
+          APIResponse("desc", content: {
         "application/json": APIMediaType(schema: ctx.schema.getObject("foo"))
       });
 
@@ -359,52 +361,68 @@ void main() {
     });
 
     test("Non-string key map throws error", () {
-      final schema = (RuntimeContext.current.replicas![InvalidMapKey] as SerializableRuntime).documentSchema(ctx);
+      final schema = (RuntimeContext.current.replicas![InvalidMapKey]
+              as SerializableRuntime)
+          .documentSchema(ctx);
       expect(schema.properties!.isEmpty, true);
-      expect(schema.additionalPropertyPolicy, equals(APISchemaAdditionalPropertyPolicy.freeForm));
+      expect(schema.additionalPropertyPolicy,
+          equals(APISchemaAdditionalPropertyPolicy.freeForm));
       expect(schema.description, contains("Failed to"));
       expect(schema.description, contains("Map"));
     });
 
     test("List that contains non-serializble types throws", () {
-      final schema = (RuntimeContext.current.replicas![InvalidListValue] as SerializableRuntime).documentSchema(ctx);
+      final schema = (RuntimeContext.current.replicas![InvalidListValue]
+              as SerializableRuntime)
+          .documentSchema(ctx);
       expect(schema.properties!.isEmpty, true);
-      expect(schema.additionalPropertyPolicy, equals(APISchemaAdditionalPropertyPolicy.freeForm));
+      expect(schema.additionalPropertyPolicy,
+          equals(APISchemaAdditionalPropertyPolicy.freeForm));
       expect(schema.description, contains("Failed to"));
       expect(schema.description, contains("DefaultChannel"));
     });
 
     test("Map that contains values that aren't serializable throws", () {
-      final schema = (RuntimeContext.current.replicas![InvalidMapValue] as SerializableRuntime).documentSchema(ctx);
+      final schema = (RuntimeContext.current.replicas![InvalidMapValue]
+              as SerializableRuntime)
+          .documentSchema(ctx);
       expect(schema.properties!.isEmpty, true);
-      expect(schema.additionalPropertyPolicy, equals(APISchemaAdditionalPropertyPolicy.freeForm));
+      expect(schema.additionalPropertyPolicy,
+          equals(APISchemaAdditionalPropertyPolicy.freeForm));
       expect(schema.description, contains("Failed to"));
       expect(schema.description, contains("DefaultChannel"));
     });
 
     test("Type documentation for complex types", () {
-      final schema = (RuntimeContext.current.replicas![ComplexTypes] as SerializableRuntime).documentSchema(ctx);
+      final schema = (RuntimeContext.current.replicas![ComplexTypes]
+              as SerializableRuntime)
+          .documentSchema(ctx);
 
       expect(schema.properties!["a"]!.type, APIType.object);
-      expect(schema.properties!["a"]!.additionalPropertySchema!.type, APIType.integer);
+      expect(schema.properties!["a"]!.additionalPropertySchema!.type,
+          APIType.integer);
 
       expect(schema.properties!["b"]!.type, APIType.array);
       expect(schema.properties!["b"]!.items!.type, APIType.integer);
 
       expect(schema.properties!["c"]!.type, APIType.array);
       expect(schema.properties!["c"]!.items!.type, APIType.object);
-      expect(schema.properties!["c"]!.items!.additionalPropertySchema!.type, APIType.string);
+      expect(schema.properties!["c"]!.items!.additionalPropertySchema!.type,
+          APIType.string);
 
       expect(schema.properties!["d"]!.type, APIType.array);
       expect(schema.properties!["d"]!.items!.type, APIType.object);
-      expect(schema.properties!["d"]!.items!.properties!["x"]!.type, APIType.integer);
+      expect(schema.properties!["d"]!.items!.properties!["x"]!.type,
+          APIType.integer);
 
       expect(schema.properties!["e"]!.type, APIType.object);
       expect(schema.properties!["e"]!.properties!["x"]!.type, APIType.integer);
 
       expect(schema.properties!["f"]!.type, APIType.object);
-      expect(schema.properties!["f"]!.additionalPropertySchema!.type, APIType.array);
-      expect(schema.properties!["f"]!.additionalPropertySchema!.items!.type, APIType.string);
+      expect(schema.properties!["f"]!.additionalPropertySchema!.type,
+          APIType.array);
+      expect(schema.properties!["f"]!.additionalPropertySchema!.items!.type,
+          APIType.string);
 
       expect(schema.properties!["integer"]!.type, APIType.integer);
       expect(schema.properties!["doublePrecision"]!.type, APIType.number);
@@ -664,6 +682,4 @@ class UnaccountedForControllerWithComponents extends Controller {
   FutureOr<RequestOrResponse> handle(Request request) {
     return Response.ok(null);
   }
-
-
 }

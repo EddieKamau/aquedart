@@ -613,12 +613,16 @@ class MultiValidate extends ManagedObject<_MultiValidate>
     implements _MultiValidate {}
 
 const validateReference = Validate.compare(lessThan: 100);
+
 class _MultiValidate {
   @primaryKey
   int? id;
 
   @validateReference
   @Validate.compare(lessThan: 5)
-  @Column(validators: [Validate.compare(greaterThan: 3), Validate.compare(equalTo: 4)])
+  @Column(validators: [
+    Validate.compare(greaterThan: 3),
+    Validate.compare(equalTo: 4)
+  ])
   int? canOnlyBe4;
 }

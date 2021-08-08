@@ -404,7 +404,8 @@ void main() {
       await updateQuery.updateOne();
 
       final q = Query<Left>(context!)
-        ..join<Right>(object: (l) => l.right!).join<Left>(object: (r) => r.left!);
+        ..join<Right>(object: (l) => l.right!)
+            .join<Left>(object: (r) => r.left!);
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
         {

@@ -65,7 +65,8 @@ void main() {
   });
 
   test("Non-integer, oddly named identifier", () async {
-    var response = await http.get(Uri.parse("http://localhost:8888/string/bar"));
+    var response =
+        await http.get(Uri.parse("http://localhost:8888/string/bar"));
     expect(response.body, '"bar"');
   });
 }
@@ -81,7 +82,8 @@ class TestModelController extends QueryController<TestModel> {
       statusCode = 400;
     }
 
-    if (query!.values?.backing != null && query!.values!.backing.contents.isNotEmpty) {
+    if (query!.values?.backing != null &&
+        query!.values!.backing.contents.isNotEmpty) {
       statusCode = 400;
     }
 
@@ -105,7 +107,8 @@ class TestModelController extends QueryController<TestModel> {
       statusCode = 400;
     }
 
-    if (query!.values?.backing != null && query!.values!.backing.contents.isNotEmpty) {
+    if (query!.values?.backing != null &&
+        query!.values!.backing.contents.isNotEmpty) {
       statusCode = 400;
     }
 

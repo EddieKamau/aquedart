@@ -34,7 +34,8 @@ void main() {
     // This group ensures that the right fields are returned and turned into objects,
     // not whether or not the right objects are returned.
     test("Values are not returned from implicitly joined tables", () async {
-      var q = Query<RootObject>(ctx!)..where((o) => o.child!.cid).greaterThan(1);
+      var q = Query<RootObject>(ctx!)
+        ..where((o) => o.child!.cid).greaterThan(1);
       var results = await q.fetch();
 
       for (var r in results) {
@@ -138,8 +139,10 @@ void main() {
           if (r.child!.grandChild != null) {
             expect(r.child!.grandChild!.backing.contents.length,
                 r.child!.grandChild!.entity.defaultProperties!.length);
-            for (var property in r.child!.grandChild!.entity.defaultProperties!) {
-              expect(r.child!.grandChild!.backing.contents.containsKey(property),
+            for (var property
+                in r.child!.grandChild!.entity.defaultProperties!) {
+              expect(
+                  r.child!.grandChild!.backing.contents.containsKey(property),
                   true);
             }
           }
@@ -355,7 +358,8 @@ void main() {
       expect(results.length, rootObjects.length);
       expect(results.firstWhere((r) => r.rid == 1).children!.length, 1);
       expect(results.firstWhere((r) => r.rid == 1).children!.first.cid, 2);
-      expect(results.firstWhere((r) => r.rid == 1).children!.first.grandChildren,
+      expect(
+          results.firstWhere((r) => r.rid == 1).children!.first.grandChildren,
           isNull);
       expect(results.where((r) => r.rid != 1).every((r) => r.children!.isEmpty),
           true);
@@ -386,10 +390,16 @@ void main() {
       expect(results.length, rootObjects.length);
       expect(results.firstWhere((r) => r.rid == 1).children!.length, 2);
       expect(
-          results.firstWhere((r) => r.rid == 1).children!.any((c) => c.cid == 2),
+          results
+              .firstWhere((r) => r.rid == 1)
+              .children!
+              .any((c) => c.cid == 2),
           true);
       expect(
-          results.firstWhere((r) => r.rid == 1).children!.any((c) => c.cid == 4),
+          results
+              .firstWhere((r) => r.rid == 1)
+              .children!
+              .any((c) => c.cid == 4),
           true);
       expect(results.where((r) => r.rid != 1).every((r) => r.children!.isEmpty),
           true);
@@ -474,11 +484,17 @@ void main() {
       expect(results.length, 2);
       expect(results.firstWhere((r) => r.rid == 2).children!.length, 1);
       expect(
-          results.firstWhere((r) => r.rid == 2).children!.any((c) => c.cid == 7),
+          results
+              .firstWhere((r) => r.rid == 2)
+              .children!
+              .any((c) => c.cid == 7),
           true);
       expect(results.firstWhere((r) => r.rid == 4).children!.length, 1);
       expect(
-          results.firstWhere((r) => r.rid == 4).children!.any((c) => c.cid == 9),
+          results
+              .firstWhere((r) => r.rid == 4)
+              .children!
+              .any((c) => c.cid == 9),
           true);
     }, skip: "#481");
   });

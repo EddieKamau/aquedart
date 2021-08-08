@@ -72,7 +72,8 @@ void main() {
       results = await q.fetch();
       expect(results.length, 0);
 
-      q = Query<TestModel>(context!)..where((o) => o.email).not.equalTo("%.com");
+      q = Query<TestModel>(context!)
+        ..where((o) => o.email).not.equalTo("%.com");
       results = await q.fetch();
       expect(results.length, 6);
 
@@ -112,7 +113,8 @@ void main() {
       results = await q.fetch();
       expect(results.length, 0);
 
-      q = Query<TestModel>(context!)..where((o) => o.email).not.equalTo("%.COM");
+      q = Query<TestModel>(context!)
+        ..where((o) => o.email).not.equalTo("%.COM");
       results = await q.fetch();
       expect(results.length, 6);
 
@@ -249,14 +251,16 @@ void main() {
   });
 
   test("Greater than equal to matcher", () async {
-    var q = Query<TestModel>(context!)..where((o) => o.id).greaterThanEqualTo(4);
+    var q = Query<TestModel>(context!)
+      ..where((o) => o.id).greaterThanEqualTo(4);
     var results = await q.fetch();
     expect(results.length, 3);
     expect(results[0].id, 4);
     expect(results[1].id, 5);
     expect(results[2].id, 6);
 
-    q = Query<TestModel>(context!)..where((o) => o.id).not.greaterThanEqualTo(4);
+    q = Query<TestModel>(context!)
+      ..where((o) => o.id).not.greaterThanEqualTo(4);
     results = await q.fetch();
     expect(results.length, 3);
     expect(results.every((tm) => tm.id! < 4), true);

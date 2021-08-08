@@ -90,8 +90,13 @@ class WildfireChannel extends ApplicationChannel
   }
 
   @override
-  Future<String> render(AuthRedirectController forController, Uri requestUri,
-      String? responseType, String? clientID, String? state, String? scope) async {
+  Future<String> render(
+      AuthRedirectController forController,
+      Uri requestUri,
+      String? responseType,
+      String? clientID,
+      String? state,
+      String? scope) async {
     final map = {
       "response_type": responseType,
       "client_id": clientID,

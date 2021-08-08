@@ -144,7 +144,8 @@ class AuthToken {
     final map = {
       "access_token": accessToken,
       "token_type": type,
-      "expires_in": expirationDate!.difference(DateTime.now().toUtc()).inSeconds,
+      "expires_in":
+          expirationDate!.difference(DateTime.now().toUtc()).inSeconds,
     };
 
     if (refreshToken != null) {
@@ -177,7 +178,7 @@ class AuthCode {
   /// Authorization codes are owned by a resource owner, typically a User, Profile or Account
   /// in an application. This value is the primary key or identifying value of those
   /// instances.
-  String? resourceOwnerIdentifier; 
+  String? resourceOwnerIdentifier;
 
   /// The timestamp this authorization code was issued on.
   DateTime? issueDate;

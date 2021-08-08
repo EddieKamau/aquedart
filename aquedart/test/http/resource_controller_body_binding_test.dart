@@ -230,15 +230,11 @@ void main() {
 
 Future<http.Response> postJSON(dynamic body) {
   if (body == null) {
-    return http.post(Uri.parse("http://localhost:4040"), headers: {
-      "Content-Type": "application/json"
-    });
+    return http.post(Uri.parse("http://localhost:4040"),
+        headers: {"Content-Type": "application/json"});
   }
-  return http
-      .post(Uri.parse("http://localhost:4040"),
-          headers: {"Content-Type": "application/json"},
-          body: json.encode(body))
-      ;
+  return http.post(Uri.parse("http://localhost:4040"),
+      headers: {"Content-Type": "application/json"}, body: json.encode(body));
 }
 
 class TestModel extends ManagedObject<_TestModel> implements _TestModel {}

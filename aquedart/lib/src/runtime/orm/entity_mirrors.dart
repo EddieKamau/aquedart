@@ -22,7 +22,7 @@ ManagedType getManagedTypeFromType(TypeMirror type) {
   } else if (type.isSubtypeOf(reflectType(Map))) {
     if (!type.typeArguments.first.isAssignableTo(reflectType(String))) {
       throw UnsupportedError(
-        "Invalid type '${type.reflectedType}' for 'ManagedType'. Key is invalid; must be 'String'.");
+          "Invalid type '${type.reflectedType}' for 'ManagedType'. Key is invalid; must be 'String'.");
     }
     kind = ManagedPropertyType.map;
     elements = getManagedTypeFromType(type.typeArguments.last);
@@ -34,18 +34,19 @@ ManagedType getManagedTypeFromType(TypeMirror type) {
   } else if (type is ClassMirror && type.isEnum) {
     kind = ManagedPropertyType.string;
     final enumeratedCases = type.getField(#values).reflectee as List<dynamic>;
-    enumerationMap = enumeratedCases.fold(<String, dynamic>{}, (m, v) {
-      m[v.toString().split(".").last] = v;
-      return m;
-    } as Map<String, dynamic>? Function(Map<String, dynamic>?, dynamic));
+    enumerationMap = enumeratedCases.fold(
+        <String, dynamic>{},
+        (m, v) {
+          m[v.toString().split(".").last] = v;
+          return m;
+        } as Map<String, dynamic>? Function(Map<String, dynamic>?, dynamic));
   } else {
     throw UnsupportedError(
-      "Invalid type '${type.reflectedType}' for 'ManagedType'.");
+        "Invalid type '${type.reflectedType}' for 'ManagedType'.");
   }
 
   return ManagedType(type.reflectedType, kind, elements, enumerationMap);
 }
-
 
 // Expanding the list of ivars for each class yields duplicates of
 // any ivar is overridden. Since the order in which ivars are returned

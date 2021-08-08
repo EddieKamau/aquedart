@@ -12,7 +12,7 @@ class PostgresQueryReduce<T extends ManagedObject>
 
   final PostgresQuery<T> query;
 
-  @override 
+  @override
   Future<double?> average(num? selector(T object)) {
     return _execute("avg(${_columnName(selector)})::float");
   }
@@ -52,10 +52,11 @@ class PostgresQueryReduce<T extends ManagedObject>
     }
 
     final store = query.context.persistentStore as PostgreSQLPersistentStore;
-    final connection = await store.executionContext ;
+    final connection = await store.executionContext;
     try {
       final result = await connection
-          .query(buffer.toString(), substitutionValues: builder.variables as Map<String, dynamic>?)
+          .query(buffer.toString(),
+              substitutionValues: builder.variables as Map<String, dynamic>?)
           .timeout(Duration(seconds: query.timeoutInSeconds));
       return result.first.first as U;
     } on TimeoutException catch (e) {

@@ -118,7 +118,8 @@ void main() {
       () async {
     await context.transaction((t) async {
       await Query.insertObject(t, Model()..name = "1");
-      await t.persistentStore!.execute("INSERT INTO _Model (name) VALUES ('2')");
+      await t.persistentStore!
+          .execute("INSERT INTO _Model (name) VALUES ('2')");
       await Query.insertObject(t, Model()..name = "3");
     });
 

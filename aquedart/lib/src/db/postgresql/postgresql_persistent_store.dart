@@ -95,12 +95,12 @@ class PostgreSQLPersistentStore extends PersistentStore
   late PostgreSQLConnection? _databaseConnection;
   Completer<PostgreSQLConnection>? _pendingConnectionCompleter;
 
-
   /// Retrieves the query execution context of this store.
   ///
   /// Use this property to execute raw queries on the underlying database connection.
   /// If running a transaction, this context is the transaction context.
-  Future<PostgreSQLExecutionContext> get executionContext => getDatabaseConnection();
+  Future<PostgreSQLExecutionContext> get executionContext =>
+      getDatabaseConnection();
 
   /// Retrieves a connection to the database this instance connects to.
   ///
@@ -295,10 +295,12 @@ class PostgreSQLPersistentStore extends PersistentStore
 
       if (returnType == PersistentStoreQueryReturnType.rows) {
         results = await dbConnection.query(formatString,
-            substitutionValues: values as Map<String, dynamic>?, timeoutInSeconds: timeoutInSeconds);
+            substitutionValues: values as Map<String, dynamic>?,
+            timeoutInSeconds: timeoutInSeconds);
       } else {
         results = await dbConnection.execute(formatString,
-            substitutionValues: values as Map<String, dynamic>?, timeoutInSeconds: timeoutInSeconds);
+            substitutionValues: values as Map<String, dynamic>?,
+            timeoutInSeconds: timeoutInSeconds);
       }
 
       logger.fine(() =>

@@ -5,8 +5,17 @@ import 'package:aquedart/aquedart.dart';
 
 void main() {
   test("Find default ApplicationChannel", () {
-    expect(RuntimeContext.current.replicas!.iterable.whereType<ChannelRuntime>().length, equals(1));
-    expect(RuntimeContext.current.replicas!.iterable.whereType<ChannelRuntime>().first.channelType, equals(TestChannel));
+    expect(
+        RuntimeContext.current.replicas!.iterable
+            .whereType<ChannelRuntime>()
+            .length,
+        equals(1));
+    expect(
+        RuntimeContext.current.replicas!.iterable
+            .whereType<ChannelRuntime>()
+            .first
+            .channelType,
+        equals(TestChannel));
   });
 }
 

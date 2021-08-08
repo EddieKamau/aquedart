@@ -263,7 +263,8 @@ class SchemaColumnDifference {
             "Cannot change primary key of '${expectedColumn!.table!.name}'");
       }
 
-      if (actualColumn!.relatedColumnName != expectedColumn!.relatedColumnName) {
+      if (actualColumn!.relatedColumnName !=
+          expectedColumn!.relatedColumnName) {
         throw SchemaException(
             "Cannot change Relationship inverse of '${expectedColumn!.table!.name}.${expectedColumn!.name}'");
       }
@@ -296,12 +297,12 @@ class SchemaColumnDifference {
 
       if (expectedColumn!.isUnique != actualColumn!.isUnique) {
         _differingProperties.add(_PropertyDifference(
-          "isUnique", expectedColumn!.isUnique, actualColumn!.isUnique));
+            "isUnique", expectedColumn!.isUnique, actualColumn!.isUnique));
       }
 
       if (expectedColumn!.isNullable != actualColumn!.isNullable) {
-        _differingProperties.add(_PropertyDifference(
-            "isNullable", expectedColumn!.isNullable, actualColumn!.isNullable));
+        _differingProperties.add(_PropertyDifference("isNullable",
+            expectedColumn!.isNullable, actualColumn!.isNullable));
       }
 
       if (expectedColumn!.defaultValue != actualColumn!.defaultValue) {
@@ -310,8 +311,8 @@ class SchemaColumnDifference {
       }
 
       if (expectedColumn!.deleteRule != actualColumn!.deleteRule) {
-        _differingProperties.add(_PropertyDifference(
-            "deleteRule", expectedColumn!.deleteRule, actualColumn!.deleteRule));
+        _differingProperties.add(_PropertyDifference("deleteRule",
+            expectedColumn!.deleteRule, actualColumn!.deleteRule));
       }
     }
   }
@@ -347,7 +348,8 @@ class SchemaColumnDifference {
     }
 
     return _differingProperties.map((property) {
-      return property.getErrorMessage(expectedColumn!.table!.name, expectedColumn!.name);
+      return property.getErrorMessage(
+          expectedColumn!.table!.name, expectedColumn!.name);
     }).toList();
   }
 
@@ -363,6 +365,6 @@ class _PropertyDifference {
 
   String getErrorMessage(String? actualTableName, String? expectedColumnName) {
     return "Column '${expectedColumnName}' in table '${actualTableName}' expected "
-      "'$expectedValue' for '$name', but migration files yield '$actualValue'";
+        "'$expectedValue' for '$name', but migration files yield '$actualValue'";
   }
 }

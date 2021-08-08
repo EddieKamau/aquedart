@@ -62,7 +62,9 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
       ]
           .expand((i) => i!)
           .map((p) => reflectType(p.type).location!.sourceUri)
-          .where((uri) =>uri.scheme == "package" || (uri.scheme == "file" && uri.isAbsolute))
+          .where((uri) =>
+              uri.scheme == "package" ||
+              (uri.scheme == "file" && uri.isAbsolute))
           .map((uri) => "import '$uri';")
           .toList();
       directives.addAll(imports);

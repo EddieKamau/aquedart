@@ -96,7 +96,8 @@ class CLIDatabaseUpgrade extends CLICommand
     var s = persistentStore;
     if (s is PostgreSQLPersistentStore) {
       return DBInfo("postgres", s.username, s.password, s.host, s.port,
-          s.databaseName, s.timeZone, useSSL: s.isSSLConnection);
+          s.databaseName, s.timeZone,
+          useSSL: s.isSSLConnection);
     }
 
     return null;

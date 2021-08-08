@@ -469,7 +469,8 @@ class CrashingCodec extends Codec<String?, List<int>?> {
   @override
   CrashingEncoder get encoder => CrashingEncoder();
   @override
-  Converter<List<int>, String> get decoder => null as Converter<List<int>, String>;
+  Converter<List<int>, String> get decoder =>
+      null as Converter<List<int>, String>;
 }
 
 class CrashingEncoder extends Converter<String, List<int>> {

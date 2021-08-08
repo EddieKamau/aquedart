@@ -19,6 +19,7 @@ class CLIClient {
 
     throw StateError("is not a project terminal");
   }
+
   List<String>? defaultArgs;
 
   String get output {
@@ -61,7 +62,8 @@ class CLIClient {
     if (dstDirectory.existsSync()) {
       dstDirectory.deleteSync(recursive: true);
     }
-    CommandLineAgent.copyDirectory(src: agent.workingDirectory.uri, dst: dstUri);
+    CommandLineAgent.copyDirectory(
+        src: agent.workingDirectory.uri, dst: dstUri);
     return CLIClient(ProjectAgent.existing(dstUri));
   }
 
@@ -73,16 +75,14 @@ class CLIClient {
       {String name = "application_test",
       String? template,
       bool offline = true}) async {
-        final args = <String>[];
+    final args = <String>[];
     if (template == null) {
       final client = CLIClient(ProjectAgent(name, dependencies: {
-        "aquedart" : {
-          "path": "../.."
-        }
+        "aquedart": {"path": "../.."}
       }, devDependencies: {
         "test": "^1.0.0"
       }));
-      
+
       client.projectAgent.addLibraryFile("channel", """
 import 'dart:async';
 
@@ -103,19 +103,15 @@ class TestChannel extends ApplicationChannel {
   }
 }
   """);
-      
+
       return client;
-    }else{
-      
+    } else {
       args.addAll(["-t", template]);
-    
     }
-    
+
     try {
       ProjectAgent.projectsDirectory.createSync();
     } catch (_) {}
-
-    
 
     if (offline) {
       args.add("--offline");
@@ -126,14 +122,14 @@ class TestChannel extends ApplicationChannel {
     await run("create", args);
     print("$output");
 
-    return CLIClient(ProjectAgent.existing(ProjectAgent.projectsDirectory.uri.resolve("$name/")));
+    return CLIClient(ProjectAgent.existing(
+        ProjectAgent.projectsDirectory.uri.resolve("$name/")));
   }
 
   Future<int> executeMigrations(
       {String connectString =
           "postgres://dart:dart@localhost:5432/dart_test"}) async {
-    final res =
-        await run("db", ["upgrade", "--connect", connectString]);
+    final res = await run("db", ["upgrade", "--connect", connectString]);
     if (res != 0) {
       print("executeMigrations failed: $output");
     }

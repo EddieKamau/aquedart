@@ -32,7 +32,7 @@ abstract class CLIProject implements CLICommand {
             "Failed to locate pubspec.yaml in project directory '${projectDirectory!.path}'");
       }
       var yamlContents = file.readAsStringSync();
-      final yaml = loadYaml(yamlContents) as Map<dynamic, dynamic> ;
+      final yaml = loadYaml(yamlContents) as Map<dynamic, dynamic>;
       _pubspec = yaml.cast<String, dynamic>();
     }
 
@@ -50,7 +50,8 @@ abstract class CLIProject implements CLICommand {
 
   Version? get projectVersion {
     if (_projectVersion == null) {
-      var lockFile = File.fromUri(projectDirectory!.uri.resolve("pubspec.lock"));
+      var lockFile =
+          File.fromUri(projectDirectory!.uri.resolve("pubspec.lock"));
       if (!lockFile.existsSync()) {
         throw CLIException("No pubspec.lock file. Run `pub get`.");
       }
@@ -101,9 +102,9 @@ abstract class CLIProject implements CLICommand {
 
   Future<String> getChannelName() async {
     final name = await Loner.run(GetChannelExecutable({}),
-      packageConfigURI: packageConfigUri,
-      imports: GetChannelExecutable.importsForPackage(libraryName),
-      logHandler: displayProgress);
+        packageConfigURI: packageConfigUri,
+        imports: GetChannelExecutable.importsForPackage(libraryName),
+        logHandler: displayProgress);
     // if (name == null) {
     //   throw CLIException(
     //     "No ApplicationChannel subclass found in $packageName/$libraryName");
@@ -111,5 +112,4 @@ abstract class CLIProject implements CLICommand {
 
     return name;
   }
-
 }

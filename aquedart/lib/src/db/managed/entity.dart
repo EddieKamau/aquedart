@@ -168,8 +168,8 @@ class ManagedEntity implements APIComponentDocumenter {
   /// If [backing] is non-null, it will be the backing map of the returned object.
   T instanceOf<T extends ManagedObject?>({ManagedBacking? backing}) {
     if (backing != null) {
-      return (runtime!.instanceOfImplementation(backing: backing)..entity = this)
-          as T;
+      return (runtime!.instanceOfImplementation(backing: backing)
+        ..entity = this) as T;
     }
     return (runtime!.instanceOfImplementation()..entity = this) as T;
   }
@@ -285,11 +285,14 @@ class ManagedEntity implements APIComponentDocumenter {
 
   APISchemaObject document(APIDocumentContext context) {
     final schemaProperties = <String?, APISchemaObject>{};
-    final obj = APISchemaObject.object(schemaProperties as Map<String, APISchemaObject>?)..title = "$name";
+    final obj = APISchemaObject.object(
+        schemaProperties as Map<String, APISchemaObject>?)
+      ..title = "$name";
 
     final buffer = StringBuffer();
     if (uniquePropertySet != null) {
-      final propString = uniquePropertySet!.map((s) => "'${s!.name}'").join(", ");
+      final propString =
+          uniquePropertySet!.map((s) => "'${s!.name}'").join(", ");
       buffer.writeln(
           "No two objects may have the same value for all of: $propString.");
     }

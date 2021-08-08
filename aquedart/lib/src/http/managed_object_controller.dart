@@ -101,9 +101,7 @@ class ManagedObjectController<InstanceType extends ManagedObject>
 
     InstanceType result = (await _query?.fetchOne())!;
 
-   
     return didFindObject(result);
-    
   }
 
   /// Executed prior to an insert query being executed.
@@ -218,7 +216,7 @@ class ManagedObjectController<InstanceType extends ManagedObject>
     // if (results == null) {
     //   return didNotFindObjectToUpdateWithID(id);
     // } else {
-      return didUpdateObject(results);
+    return didUpdateObject(results);
     // }
   }
 
@@ -463,6 +461,5 @@ class ManagedObjectController<InstanceType extends ManagedObject>
     } on FormatException {
       throw onError ?? Response.badRequest();
     }
-
   }
 }

@@ -19,7 +19,7 @@ class TableBuilder implements Returnable {
     if (parent != null) {
       tableAlias = createTableAlias();
     }
-    returning = ColumnBuilder.fromKeys(this, query.propertiesToFetch );
+    returning = ColumnBuilder.fromKeys(this, query.propertiesToFetch);
 
     columnSortBuilders = query.sortDescriptors
             ?.map((s) => ColumnSortBuilder(this, s.key, s.order))
@@ -27,16 +27,19 @@ class TableBuilder implements Returnable {
         [];
 
     if (query.pageDescriptor != null) {
-      columnSortBuilders.add(ColumnSortBuilder(
-          this, query.pageDescriptor!.propertyName, query.pageDescriptor!.order));
+      columnSortBuilders.add(ColumnSortBuilder(this,
+          query.pageDescriptor!.propertyName, query.pageDescriptor!.order));
 
       if (query.pageDescriptor!.boundingValue != null) {
         final prop = entity!.properties[query.pageDescriptor!.propertyName];
         final operator = query.pageDescriptor!.order == QuerySortOrder.ascending
             ? PredicateOperator.greaterThan
             : PredicateOperator.lessThan;
-        final expr = ColumnExpressionBuilder(this, prop,
-            ComparisonExpression(query.pageDescriptor!.boundingValue, operator));
+        final expr = ColumnExpressionBuilder(
+            this,
+            prop,
+            ComparisonExpression(
+                query.pageDescriptor!.boundingValue, operator));
         expressionBuilders.add(expr);
       }
     }
@@ -49,7 +52,8 @@ class TableBuilder implements Returnable {
     addColumnExpressions(query.expressions);
   }
 
-  TableBuilder.implicit(this.parent, ManagedRelationshipDescription this.joinedBy)
+  TableBuilder.implicit(
+      this.parent, ManagedRelationshipDescription this.joinedBy)
       : entity = joinedBy.inverse!.entity,
         _manualPredicate = QueryPredicate.empty() {
     tableAlias = createTableAlias();
@@ -178,7 +182,8 @@ class TableBuilder implements Returnable {
     TableBuilder joinedTable = _findJoinedTable(expression.keyPath);
     final lastElement = expression.keyPath.path.last;
     if (lastElement is ManagedRelationshipDescription) {
-      final inversePrimaryKey = lastElement.inverse!.entity!.primaryKeyAttribute;
+      final inversePrimaryKey =
+          lastElement.inverse!.entity!.primaryKeyAttribute;
       final expr = ColumnExpressionBuilder(
           joinedTable, inversePrimaryKey, expression.expression,
           prefix: tableAlias);

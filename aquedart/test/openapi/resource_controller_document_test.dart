@@ -173,7 +173,8 @@ void main() {
             .path,
         "/components/schemas/Override");
     expect(document.components!.schemas["OverrideGeneration"], isNull);
-    expect(document.components!.schemas["Override"]!.properties!["k"], isNotNull);
+    expect(
+        document.components!.schemas["Override"]!.properties!["k"], isNotNull);
   });
 
   test("Inherited operation methods are available in document", () {
@@ -292,4 +293,3 @@ class OverrideGeneration extends Serializable {
 }
 
 class PODO {}
-

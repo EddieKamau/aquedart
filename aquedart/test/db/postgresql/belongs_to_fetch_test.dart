@@ -146,7 +146,8 @@ void main() {
 
   group("Join on parent of hasMany relationship", () {
     test("Standard join", () async {
-      var q = Query<ChildObject>(ctx!)..join<RootObject>(object: (c) => c.parents!);
+      var q = Query<ChildObject>(ctx!)
+        ..join<RootObject>(object: (c) => c.parents!);
       var results = await q.fetch();
 
       expect(
@@ -181,7 +182,9 @@ void main() {
 
     test("Nested join", () async {
       var q = Query<GrandChildObject>(ctx!);
-      q.join<ChildObject>(object: (c) => c.parents!).join<RootObject>(object: (c) => c.parents!);
+      q
+          .join<ChildObject>(object: (c) => c.parents!)
+          .join<RootObject>(object: (c) => c.parents!);
       var results = await q.fetch();
 
       expect(
@@ -384,7 +387,9 @@ void main() {
       var q = Query<GrandChildObject>(ctx!)
         ..sortBy((g) => g.gid, QuerySortOrder.ascending);
 
-      q.join<ChildObject>(object: (c) => c.parent!).join<RootObject>(object: (c) => c.parent!);
+      q
+          .join<ChildObject>(object: (c) => c.parent!)
+          .join<RootObject>(object: (c) => c.parent!);
 
       var results = await q.fetch();
 

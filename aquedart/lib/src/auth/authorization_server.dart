@@ -93,7 +93,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
 
   /// Used during OpenAPI documentation.
   final APISecuritySchemeOAuth2Flow documentedImplicitFlow =
-  APISecuritySchemeOAuth2Flow.empty()..scopes = {};
+      APISecuritySchemeOAuth2Flow.empty()..scopes = {};
 
   static const String tokenTypeBearer = "bearer";
 
@@ -157,8 +157,8 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
   /// If credentials are not correct, it will throw the appropriate [AuthRequestError].
   ///
   /// After [expiration], this token will no longer be valid.
-  Future<AuthToken> authenticate(
-      String? username, String? password, String? clientID, String? clientSecret,
+  Future<AuthToken> authenticate(String? username, String? password,
+      String? clientID, String? clientSecret,
       {Duration expiration = const Duration(hours: 24),
       List<AuthScope>? requestedScopes}) async {
     if (clientID == null) {
@@ -428,7 +428,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
     final basic = APISecurityScheme.http("basic")
       ..description =
           "This endpoint requires an OAuth2 Client ID and Secret as the Basic Authentication username and password. "
-          "If the client ID does not have a secret (public client), the password is the empty string (retain the separating colon, e.g. 'com.aquedart.app:').";
+              "If the client ID does not have a secret (public client), the password is the empty string (retain the separating colon, e.g. 'com.aquedart.app:').";
     context.securitySchemes.register("oauth2-client-authentication", basic);
 
     final oauth2 = APISecurityScheme.oauth2({

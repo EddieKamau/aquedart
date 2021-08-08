@@ -281,7 +281,8 @@ class Request implements RequestOrResponse {
       return response.close();
     } else if (body is Stream) {
       // Otherwise, body is stream
-      final bodyStream = _responseBodyStream(aquedartResponse, compressionType)!;
+      final bodyStream =
+          _responseBodyStream(aquedartResponse, compressionType)!;
       if (compressionType.value != null) {
         response.headers
             .add(HttpHeaders.contentEncodingHeader, compressionType.value!);

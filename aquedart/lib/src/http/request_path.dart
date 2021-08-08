@@ -28,7 +28,7 @@ class RequestPath {
         orderedVariableNames.add(segment.variableName);
       } else if (segment.isRemainingMatcher) {
         var remaining = [];
-        remaining.add(requestIterator.current );
+        remaining.add(requestIterator.current);
         while (requestIterator.moveNext()) {
           remaining.add(requestIterator.current);
         }

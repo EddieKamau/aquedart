@@ -438,23 +438,27 @@ void main() {
 
   group("Authorization objects", () {
     test("Authorization has scope for exact scope", () {
-      var auth = Authorization("id", 1.toString(), null, scopes: [AuthScope("a")]);
+      var auth =
+          Authorization("id", 1.toString(), null, scopes: [AuthScope("a")]);
       expect(auth.isAuthorizedForScope("a"), true);
     });
 
     test("Authorization has scope for scope with more privileges", () {
-      var auth = Authorization("id", 1.toString(), null, scopes: [AuthScope("a")]);
+      var auth =
+          Authorization("id", 1.toString(), null, scopes: [AuthScope("a")]);
       expect(auth.isAuthorizedForScope("a:foo"), true);
     });
 
     test("Authorization does not have access to different scope", () {
-      var auth = Authorization("id", 1.toString(), null, scopes: [AuthScope("a")]);
+      var auth =
+          Authorization("id", 1.toString(), null, scopes: [AuthScope("a")]);
       expect(auth.isAuthorizedForScope("b"), false);
     });
 
     test("Authorization does not have access to higher privileged scope",
         () async {
-      var auth = Authorization("id", 1.toString(), null, scopes: [AuthScope("a:foo")]);
+      var auth =
+          Authorization("id", 1.toString(), null, scopes: [AuthScope("a:foo")]);
       expect(auth.isAuthorizedForScope("a"), false);
     });
   });
@@ -481,7 +485,8 @@ Future<RequestOrResponse> respond(Request req) async {
   };
 
   if ((req.authorization!.scopes?.length ?? 0) > 0) {
-    map["scopes"] = req.authorization!.scopes!.map((s) => s.toString()).toList();
+    map["scopes"] =
+        req.authorization!.scopes!.map((s) => s.toString()).toList();
   }
 
   return Response.ok(map);
