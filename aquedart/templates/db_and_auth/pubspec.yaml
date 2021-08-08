@@ -3,11 +3,11 @@ description: An aquedart application with a database connection, data model and 
 version: 0.0.1
 
 environment:
-  sdk: ">=2.0.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
 
-  aquedart: ^5.0.0-b1
+  aquedart: ^5.0.1
   aquedart_test: ^3.0.0
 
 #   aquedart:

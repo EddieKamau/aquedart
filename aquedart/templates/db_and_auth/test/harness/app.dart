@@ -23,12 +23,12 @@ export 'package:aquedart/aquedart.dart';
 class Harness extends TestHarness<WildfireChannel>
     with TestHarnessAuthMixin<WildfireChannel>, TestHarnessORMMixin {
   @override
-  ManagedContext get context => channel.context;
+  ManagedContext? get context => channel.context;
 
   @override
-  AuthServer get authServer => channel.authServer;
+  AuthServer? get authServer => channel.authServer;
 
-  Agent publicAgent;
+  late Agent publicAgent;
 
   @override
   Future onSetUp() async {
@@ -38,12 +38,12 @@ class Harness extends TestHarness<WildfireChannel>
     publicAgent = await addClient("com.aquedart.public");
   }
 
-  Future<Agent> registerUser(User user, {Agent withClient}) async {
+  Future<Agent> registerUser(User user, {required Agent withClient}) async {
 
     final req = withClient.request("/register")
       ..body = {"username": user.username, "password": user.password};
     await req.post();
 
-    return loginUser(withClient, user.username, user.password);
+    return loginUser(withClient, user.username!, user.password!);
   }
 }

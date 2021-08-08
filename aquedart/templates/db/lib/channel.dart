@@ -6,7 +6,7 @@ import 'package:wildfire/wildfire.dart';
 /// Override methods in this class to set up routes and initialize services like
 /// database connections. See http://aldrinsartfactory.github.io/aquedart/http/channel/.
 class WildfireChannel extends ApplicationChannel {
-  ManagedContext context;
+  ManagedContext? context;
 
   /// Initialize services in this method.
   ///
@@ -19,7 +19,7 @@ class WildfireChannel extends ApplicationChannel {
     logger.onRecord.listen(
         (rec) => print("$rec ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
 
-    final config = WildfireConfiguration(options.configurationFilePath);
+    final config = WildfireConfiguration(options!.configurationFilePath!);
     context = contextWithConnectionInfo(config.database);
   }
 
@@ -35,7 +35,7 @@ class WildfireChannel extends ApplicationChannel {
 
     router
         .route("/model/[:id]")
-        .link(() => ManagedObjectController<Model>(context));
+        .link(() => ManagedObjectController<Model>(context!));
 
     return router;
   }
@@ -67,5 +67,5 @@ class WildfireChannel extends ApplicationChannel {
 class WildfireConfiguration extends Configuration {
   WildfireConfiguration(String fileName) : super.fromFile(File(fileName));
 
-  DatabaseConfiguration database;
+  late DatabaseConfiguration database;
 }

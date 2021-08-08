@@ -5,8 +5,8 @@ import 'harness/app.dart';
 Future main() async {
   final harness = Harness()..install();
 
-  Agent userClient;
-  User defaultUser;
+  late Agent userClient;
+  late User defaultUser;
 
   setUp(() async {
     defaultUser = User()

@@ -111,7 +111,7 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
         return prev;
       });
 
-      return APIRequestBody.schema(APISchemaObject.object(props as Map<String, APISchemaObject?>?),
+      return APIRequestBody.schema(APISchemaObject.object(props as Map<String, APISchemaObject>?),
           contentTypes: ["application/x-www-form-urlencoded"], required: true);
     }
 

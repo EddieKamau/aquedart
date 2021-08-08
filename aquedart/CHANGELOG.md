@@ -1,3 +1,7 @@
+## 5.0.2
+
+- fixed precomple issue & migrated templates to null-safety
+
 ## 5.0.1
 
 - fixed precomple issue
