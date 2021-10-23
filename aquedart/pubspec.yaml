@@ -1,7 +1,7 @@
 name: aquedart
 version: 5.0.2
 description: A modern HTTP server application framework, ORM and OAuth2 provider with OpenAPI 3.0 integration. Foundation for REST, RPC or GraphQL services.
-homepage: https://aqueductt.io
+homepage: https://aqueduct.io
 documentation:
 repository: https://github.com/EddieKamau/aquedart
 

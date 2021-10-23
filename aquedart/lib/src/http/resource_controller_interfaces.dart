@@ -168,8 +168,8 @@ class ResourceControllerParameter {
         {
           var queryParameters = request!.raw.uri.queryParametersAll;
           var value = request.body.isFormData
-              ? request.body.as<Map<String, List<String>>>()[name!]
-              : queryParameters[name!];
+              ? request.body.as<Map<String, List<String>>>()[name]
+              : queryParameters[name];
           if (value == null) {
             return null;
           }

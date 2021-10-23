@@ -425,11 +425,13 @@ class AuthScope {
     // If we aren't restricted by modifier, let's make sure we have access.
     final thisIterator = _segments.iterator;
     for (var incomingSegment in incomingScope._segments) {
-      thisIterator.moveNext();
+      if (!thisIterator.moveNext()) {
+        return false;
+      }
       final current = thisIterator.current;
 
-      // If the incoming scope is more restrictive than this scope,
-      // then it's not allowed.
+      // // If the incoming scope is more restrictive than this scope,
+      // // then it's not allowed.
       // if (current == null) {
       //   return false;
       // }
@@ -458,7 +460,9 @@ class AuthScope {
   bool isExactlyScope(AuthScope scope) {
     final incomingIterator = scope._segments.iterator;
     for (var segment in _segments) {
-      incomingIterator.moveNext();
+      if(!incomingIterator.moveNext()){
+        return false;
+      }
       final incomingSegment = incomingIterator.current;
       // if (incomingSegment == null) {
       //   return false;

@@ -1,3 +1,7 @@
+## 3.0.0
+
+- Changed from Aqueduct to Aquedart
+
 ## 1.0.1
 
 - Fixes analysis warnings for Dart 2.1.1

@@ -17,11 +17,11 @@ class AuthorizationBearerParser extends AuthorizationParser<String?> {
   ///
   /// If [authorizationHeader] is malformed or null, throws an [AuthorizationParserException].
   @override
-  String? parse(String authorizationHeader) {
-    // if (authorizationHeader == null) {
-    //   throw AuthorizationParserException(
-    //       AuthorizationParserExceptionReason.missing);
-    // }
+  String? parse(String? authorizationHeader) {
+    if (authorizationHeader == null) {
+      throw AuthorizationParserException(
+          AuthorizationParserExceptionReason.missing);
+    }
 
     final matcher = RegExp("Bearer (.+)");
     final match = matcher.firstMatch(authorizationHeader);

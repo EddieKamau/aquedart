@@ -146,5 +146,5 @@ abstract class AuthServerDelegate {
   /// When overriding this method, it is important to note that (by default) only the properties declared by [ResourceOwner]
   /// will be valid for [owner]. If [owner] has properties that are application-specific (like a `role`),
   /// [getResourceOwner] must also be overridden to ensure those values are fetched.
-  List<AuthScope>? getAllowedScopes(ResourceOwner owner) => AuthScope.any;
+  List<AuthScope>? getAllowedScopes(ResourceOwner? owner) => AuthScope.any;
 }
